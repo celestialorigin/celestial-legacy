@@ -1,0 +1,171 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RiftReturn from '../../components/RiftReturn.astro';
+---
+
+<Layout title="Fragment: Past-05">
+  <main class="scene-container">
+    <!-- Scene Layer -->
+    <div class="room-visual">
+        <div class="window-light"></div>
+        <div class="table">
+            <div class="cake whole"></div>
+            <div class="plate"></div>
+        </div>
+        <div class="child-silhouette"></div>
+    </div>
+
+    <!-- UI Layer -->
+    <div class="cel-hud-status" data-state="chaos">
+      <span class="cel-hud-label">STATUS:</span>
+      <span class="cel-hud-bars"></span>
+      <span class="cel-hud-text">INTERFERENCE</span>
+    </div>
+
+    <RiftReturn />
+
+    <pre class="cel-hud-log">[LOG_05]
+
+対象を確認。
+異常物質。
+
+ケーキの一切れが残っている。
+手をつけた痕跡はない。
+
+時間は、まだここにある。
+未来は、後ろ向きに書き換えられている。</pre>
+
+    <!-- Exit Anomaly -->
+    <div class="exit-anomaly" aria-label="exit anomaly"></div>
+    <div id="anomaly-overlay" class="anomaly-transition-overlay"></div>
+  </main>
+</Layout>
+
+<script>
+  const anomaly = document.querySelector('.exit-anomaly');
+  const overlay = document.getElementById('anomaly-overlay');
+  
+  if (anomaly && overlay) {
+      anomaly.addEventListener('click', (e) => {
+          // Ejection Effect
+          overlay.classList.add('anomaly-active');
+          
+          // Noise/Audio cue could go here
+          
+          setTimeout(() => {
+              window.location.href = '/observation';
+          }, 200);
+      });
+  }
+</script>
+
+<style>
+  .scene-container {
+    height: 100vh;
+    background: #050510;
+    overflow: hidden;
+    position: relative;
+    font-family: monospace;
+    color: #fff;
+  }
+
+  /* Room Visuals */
+  .room-visual {
+      position: absolute;
+      inset: 0;
+      /* Static, Dark, Low Contrast */
+      background: radial-gradient(circle at 60% 40%, #1a1a20 0%, #000 90%);
+      z-index: 1;
+  }
+  
+  .window-light {
+      position: absolute;
+      top: 10%; right: 10%;
+      width: 200px; height: 300px;
+      /* Dim, Static Light */
+      background: linear-gradient(135deg, rgba(200,200,210,0.03), transparent);
+      transform: skewX(-20deg);
+      pointer-events: none;
+  }
+
+  .table {
+      position: absolute;
+      bottom: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 60%; height: 2px;
+      background: #222;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+  }
+  
+  .cake.whole {
+      position: absolute;
+      bottom: 2px; left: 40%;
+      width: 60px; height: 40px;
+      /* Simple, Primitive Cake */
+      background: #8d6e63; 
+      border-radius: 2px;
+  }
+  .cake.whole::before { /* Cream - Minimal */
+      content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+      background: #d7ccc8; 
+  }
+  .cake.whole::after { /* Candle - Unlit, straight */
+      content: ''; position: absolute; top: -15px; left: 50%; width: 2px; height: 15px;
+      background: #555;
+  }
+
+  .child-silhouette {
+      position: absolute;
+      bottom: 20%; left: 30%;
+      width: 60px; height: 120px;
+      background: #050505;
+      border-radius: 50% 50% 0 0;
+      opacity: 0.8;
+      filter: blur(4px);
+  }
+
+  /* --- Persistent Log Style --- */
+  .cel-hud-log {
+      position: fixed;
+      left: 16px; 
+      bottom: 16px;
+      width: auto;
+      max-width: min(520px, 92vw);
+      max-height: 30vh;
+      overflow-y: auto;
+      
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(180, 220, 255, 0.22);
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.15);
+      border-radius: 4px;
+      padding: 12px 16px 12px 12px;
+      
+      font-family: monospace;
+      font-size: clamp(11px, 1.2vw, 13px);
+      line-height: 1.6;
+      color: rgba(220, 235, 255, 0.95);
+      
+      white-space: pre-wrap;
+      z-index: 9999;
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+  }
+
+  /* Label cue */
+  .cel-hud-log::before {
+      content: "LOG_05";
+      display: block;
+      font-size: 10px;
+      color: rgba(0, 255, 255, 0.5);
+      margin-bottom: 4px;
+      letter-spacing: 0.1em;
+      animation: log-pulse 3s infinite;
+  }
+
+  @keyframes log-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+  }
+
+  @keyframes pulse { 0% { opacity: 0.7; } 50% { opacity: 1; } 100% { opacity: 0.7; } }
+</style>

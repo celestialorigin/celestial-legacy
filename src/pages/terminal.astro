@@ -1,0 +1,115 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { logs } from "../data/logs";
+
+const sortedLogs = [...logs].sort((a, b) => a.internalId.localeCompare(b.internalId));
+---
+
+<Layout title="OBSERVATION TERMINAL | CELESTIAL">
+  <div class="terminal-container container">
+    <header class="terminal-header">
+      <h1>OBSERVATION TERMINAL</h1>
+      <p class="status">CONNECTED // ENCRYPTED ACCESS</p>
+    </header>
+
+    <div class="log-grid">
+      {sortedLogs.map(log => (
+        <a href={`/log/${log.internalId}`} class="log-item">
+          <div class="log-id">{log.internalId}</div>
+          <div class="log-info">
+            <span class="log-type" data-type={log.type}>{log.type}</span>
+            <span class="log-title">{log.title}</span>
+          </div>
+          <div class="log-status">{log.status}</div>
+        </a>
+      ))}
+    </div>
+
+    <div class="footer-actions">
+      <a href="/" class="back-link">← LOGOUT</a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .terminal-container {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 0 20px;
+  }
+  .terminal-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 3rem;
+    padding-bottom: 1.5rem;
+  }
+  h1 {
+    font-size: 2.2rem;
+    color: var(--c-accent);
+    letter-spacing: 0.2rem;
+  }
+  .status {
+    font-size: 0.8rem;
+    font-family: monospace;
+    opacity: 0.5;
+  }
+  .log-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+  .log-item {
+    display: grid;
+    grid-template-columns: 140px 1fr 100px;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    text-decoration: none;
+    color: #fff;
+    transition: all 0.3s ease;
+  }
+  .log-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--c-accent);
+    transform: translateX(5px);
+  }
+  .log-id {
+    font-family: monospace;
+    font-size: 0.85rem;
+    opacity: 0.5;
+  }
+  .log-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .log-type {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    border-radius: 3px;
+    background: rgba(255, 255, 255, 0.1);
+    opacity: 0.7;
+  }
+  .log-type[data-type="SYSTEM"] { background: rgba(0, 255, 255, 0.15); color: #0ff; }
+  .log-type[data-type="ERROR"] { background: rgba(255, 0, 0, 0.15); color: #f88; }
+  .log-type[data-type="META"] { background: rgba(150, 0, 255, 0.15); color: #d8f; }
+
+  .log-status {
+    text-align: right;
+    font-size: 0.75rem;
+    font-family: monospace;
+    opacity: 0.4;
+  }
+  .back-link {
+    display: inline-block;
+    margin-top: 4rem;
+    opacity: 0.5;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  .back-link:hover {
+    opacity: 1;
+    color: var(--c-accent);
+  }
+</style>

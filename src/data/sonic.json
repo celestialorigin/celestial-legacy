@@ -1,0 +1,12 @@
+[
+    {
+        "id": "ST-AUDIO-2024-0105-001",
+        "date": "2024-01-05",
+        "title": "未確認信号の残響",
+        "status": "FRAGMENT",
+        "slug": "st-2024-0105-001",
+        "message": "音響解析：受信信号アーカイブ。複数の周波数帯で干渉を確認。",
+        "primaryUrl": "https://www.youtube.com/@your_channel",
+        "workUrl": "https://www.youtube.com/watch?v=sample"
+    }
+]

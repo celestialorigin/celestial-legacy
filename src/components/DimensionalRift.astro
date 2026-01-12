@@ -1,0 +1,381 @@
+---
+interface Props {
+  position?: 'left' | 'right';
+  href?: string;
+  variant?: 'past' | 'future';
+}
+
+const { position = 'left', href = '/rift', variant = 'past' } = Astro.props;
+const isFuture = variant === 'future';
+---
+
+<div class={`dimensional-rift rift-${position} rift-${variant}`} data-rift-href={href}>
+  <svg class="rift-svg" viewBox="0 0 100 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <filter id={`rift-glow-${variant}`}>
+        <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    
+    {isFuture ? (
+      <>
+        <!-- Future rift: more geometric, networked pattern -->
+        <path 
+          class="rift-main"
+          d="M 50 0 L 50 50 M 30 50 L 70 50 M 50 50 L 50 100 M 35 100 L 65 100 M 50 100 L 50 150 M 40 150 L 60 150 M 50 150 L 50 200"
+          fill="none"
+          stroke="url(#rift-gradient-future)"
+          stroke-width="2"
+          filter={`url(#rift-glow-${variant})`}
+        />
+        <path 
+          class="rift-branch"
+          d="M 50 30 L 25 40 L 15 50 M 50 30 L 75 40 L 85 50 M 50 80 L 30 90 M 50 80 L 70 90 M 50 130 L 35 140 M 50 130 L 65 140 M 50 170 L 40 180 M 50 170 L 60 180"
+          fill="none"
+          stroke="rgba(138, 116, 178, 0.4)"
+          stroke-width="1"
+        />
+        <defs>
+          <linearGradient id="rift-gradient-future" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgba(138, 116, 178, 0.2);stop-opacity:1" />
+            <stop offset="50%" style="stop-color:rgba(158, 136, 198, 0.7);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgba(138, 116, 178, 0.3);stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      </>
+    ) : (
+      <>
+        <!-- Past rift: organic, crack-like pattern -->
+        <path 
+          class="rift-main"
+          d="M 50 0 Q 45 30, 55 60 Q 48 90, 52 120 Q 47 150, 50 180 L 50 200"
+          fill="none"
+          stroke="url(#rift-gradient-past)"
+          stroke-width="2"
+          filter={`url(#rift-glow-${variant})`}
+        />
+        <path 
+          class="rift-branch"
+          d="M 50 40 L 30 50 M 50 80 L 70 90 M 50 120 L 35 130 M 50 160 L 65 170"
+          fill="none"
+          stroke="rgba(0, 255, 255, 0.3)"
+          stroke-width="1"
+        />
+        <defs>
+          <linearGradient id="rift-gradient-past" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:rgba(0,255,255,0.1);stop-opacity:1" />
+            <stop offset="50%" style="stop-color:rgba(0,255,255,0.6);stop-opacity:1" />
+            <stop offset="100%" style="stop-color:rgba(0,255,255,0.2);stop-opacity:1" />
+          </linearGradient>
+        </defs>
+      </>
+    )}
+  </svg>
+  
+  <div class="rift-particles"></div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id={`rift-modal-${variant}`} class="rift-modal hidden" aria-hidden="true">
+  <div class="rift-modal__backdrop"></div>
+  <div class="rift-modal__content">
+    <div class="rift-modal__header">
+      <span class="rift-modal__title">
+        {isFuture ? 'CONVERGENCE POINT' : 'DIMENSIONAL RIFT'}
+      </span>
+    </div>
+    <div class="rift-modal__body">
+      <p>
+        {isFuture 
+          ? 'Proceed with entry to the convergence node?' 
+          : 'Proceed with entry to the fracture?'}
+      </p>
+    </div>
+    <div class="rift-modal__actions">
+      <button class={`rift-confirm-yes-${variant} rift-modal__btn rift-modal__btn--yes`}>YES</button>
+      <button class={`rift-confirm-no-${variant} rift-modal__btn rift-modal__btn--no`}>NO</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .dimensional-rift {
+    position: fixed;
+    bottom: 20px;
+    width: 60px;
+    height: 120px;
+    z-index: 500;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: auto;
+  }
+  
+  .rift-left {
+    left: 20px;
+  }
+  
+  .rift-right {
+    right: 20px;
+  }
+  
+  .dimensional-rift:hover {
+    opacity: 0.9;
+    transform: scale(1.05);
+  }
+  
+  .rift-svg {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .rift-past .rift-svg {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.4));
+  }
+  
+  .rift-future .rift-svg {
+    filter: drop-shadow(0 0 8px rgba(138, 116, 178, 0.4));
+  }
+  
+  .rift-main {
+    animation: rift-pulse 3s ease-in-out infinite;
+  }
+  
+  .rift-branch {
+    animation: rift-flicker 2s ease-in-out infinite;
+  }
+  
+  @keyframes rift-pulse {
+    0%, 100% {
+      stroke-opacity: 0.6;
+      stroke-width: 2;
+    }
+    50% {
+      stroke-opacity: 1;
+      stroke-width: 2.5;
+    }
+  }
+  
+  @keyframes rift-flicker {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    25% {
+      opacity: 0.7;
+    }
+    50% {
+      opacity: 0.4;
+    }
+    75% {
+      opacity: 0.8;
+    }
+  }
+  
+  .rift-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    animation: rift-glow 2s ease-in-out infinite;
+  }
+  
+  .rift-past .rift-particles {
+    background: radial-gradient(circle at 50% 50%, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+  }
+  
+  .rift-future .rift-particles {
+    background: radial-gradient(circle at 50% 50%, rgba(138, 116, 178, 0.1) 0%, transparent 70%);
+  }
+  
+  @keyframes rift-glow {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+  
+  /* Modal Styles */
+  .rift-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+  }
+  
+  .rift-modal.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+  
+  .rift-modal__backdrop {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(4px);
+  }
+  
+  .rift-modal__content {
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    border-radius: 8px;
+    padding: 2rem;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+  }
+  
+  .rift-modal__header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+  }
+  
+  .rift-modal__title {
+    font-family: monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    color: rgba(0, 255, 255, 0.9);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+  }
+  
+  .rift-modal__body {
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    text-align: center;
+  }
+  
+  .rift-modal__actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .rift-modal__btn {
+    padding: 0.75rem 2rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: rgba(0, 255, 255, 0.8);
+    font-family: monospace;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.1em;
+  }
+  
+  .rift-modal__btn:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  }
+  
+  .rift-modal__btn--no {
+    border-color: rgba(255, 100, 100, 0.3);
+    color: rgba(255, 100, 100, 0.8);
+  }
+  
+  .rift-modal__btn--no:hover {
+    background: rgba(255, 100, 100, 0.1);
+    border-color: rgba(255, 100, 100, 0.8);
+    box-shadow: 0 0 15px rgba(255, 100, 100, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .dimensional-rift {
+      width: 40px;
+      height: 80px;
+      bottom: 10px;
+    }
+    
+    .rift-left {
+      left: 10px;
+    }
+    
+    .rift-right {
+      right: 10px;
+    }
+    
+    .rift-modal__content {
+      padding: 1.5rem;
+    }
+    
+    .rift-modal__actions {
+      flex-direction: column;
+    }
+  }
+</style>
+
+<script>
+  // This script runs for each instance of the component
+  document.addEventListener('DOMContentLoaded', () => {
+    // Get all rifts and set up their modals
+    document.querySelectorAll('.dimensional-rift').forEach((rift) => {
+      const variant = rift.classList.contains('rift-past') ? 'past' : 'future';
+      const modal = document.getElementById(`rift-modal-${variant}`);
+      const yesBtn = document.querySelector(`.rift-confirm-yes-${variant}`);
+      const noBtn = document.querySelector(`.rift-confirm-no-${variant}`);
+      const backdrop = modal?.querySelector('.rift-modal__backdrop');
+      
+      if (!modal || !yesBtn || !noBtn) return;
+      
+      let targetHref = '';
+      
+      // Show modal on rift click
+      rift.addEventListener('click', (e) => {
+        e.preventDefault();
+        targetHref = rift.getAttribute('data-rift-href') || '/rift';
+        modal.classList.remove('hidden');
+        modal.setAttribute('aria-hidden', 'false');
+      });
+      
+      // YES button - navigate to rift page
+      yesBtn.addEventListener('click', () => {
+        window.location.href = targetHref;
+      });
+      
+      // NO button - close modal
+      noBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+      });
+      
+      // Close on backdrop click
+      backdrop?.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        modal.setAttribute('aria-hidden', 'true');
+      });
+    });
+    
+    // Close any modal on ESC key
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.rift-modal').forEach(modal => {
+          if (!modal.classList.contains('hidden')) {
+            modal.classList.add('hidden');
+            modal.setAttribute('aria-hidden', 'true');
+          }
+        });
+      }
+    });
+  });
+</script>

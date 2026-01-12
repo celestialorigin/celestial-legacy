@@ -1,0 +1,104 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="CONTACT | CELESTIAL">
+  <div class="container" style="max-width: 800px; margin: 0 auto; padding-top: 4rem;">
+    <header style="text-align: center; margin-bottom: 4rem;">
+      <h1 style="color: var(--c-accent); letter-spacing: 0.1em; margin-bottom: 1rem; font-size: 2.5rem;">CONTACT</h1>
+      <p style="opacity: 0.8; font-size: 0.95em; letter-spacing: 0.05em;">観測データの提供、または異常信号の報告はこちらの周波数まで。</p>
+    </header>
+
+    <div class="contact-grid" style="display: grid; gap: 2rem;">
+      
+      <!-- X (Twitter) Link -->
+      <a href="https://x.com/LukiaxLucia" target="_blank" rel="noopener noreferrer" class="contact-card">
+        <div class="card-content">
+          <span class="card-label">X / Lukia×Lucia</span>
+          <span class="card-arrow">↗</span>
+        </div>
+        <p class="card-desc">最新の観測状況や開発進捗を発信しています。</p>
+      </a>
+
+      <!-- Email Link -->
+      <a href="mailto:lukia_humanxlucia@proton.me" class="contact-card">
+        <div class="card-content">
+          <span class="card-label">Mail / Proton</span>
+          <span class="card-arrow">✉</span>
+        </div>
+        <p class="card-desc">lukia_humanxlucia@proton.me</p>
+      </a>
+
+    </div>
+
+    <p style="text-align: center; margin-top: 2rem; font-size: 0.85em; opacity: 0.5;">
+      ※ 応答には時間を要する場合があります。
+    </p>
+
+    <div style="margin-top: 60px; text-align: center;">
+      <a href="/" style="opacity: 0.6; text-decoration: none; font-size: 0.9em; transition: opacity 0.2s;">← HOMEへ戻る</a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .contact-card {
+    display: block;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--c-text);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-card:hover {
+    background: rgba(0, 255, 255, 0.05);
+    border-color: var(--c-accent);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .card-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--c-accent);
+    letter-spacing: 0.05em;
+  }
+
+  .card-arrow {
+    font-size: 1.2rem;
+    opacity: 0.5;
+    transition: transform 0.3s ease;
+  }
+
+  .contact-card:hover .card-arrow {
+    opacity: 1;
+    transform: translateX(5px) rotate(-45deg); /* For arrow */
+  }
+  
+  /* Adjust mail icon rotation if needed */
+  .contact-card[href^="mailto"] .card-arrow {
+      transform: none;
+  }
+  .contact-card[href^="mailto"]:hover .card-arrow {
+      transform: scale(1.1);
+  }
+
+  .card-desc {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9em;
+    font-family: monospace;
+  }
+</style>

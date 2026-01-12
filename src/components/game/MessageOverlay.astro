@@ -1,0 +1,118 @@
+---
+---
+<div id="msg-overlay" class="msg-overlay hidden" aria-hidden="true">
+  <div class="msg-content"></div>
+</div>
+
+<style>
+  .msg-overlay {
+    position: fixed;
+    top: 35%; /* Above the core (positioned at 45%) */
+    left: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 100;
+    text-align: center;
+    width: 80%;
+    max-width: 600px;
+    transition: opacity 0.5s ease;
+  }
+
+  .msg-content {
+    color: rgba(255, 255, 255, 0.9);
+    font-family: monospace;
+    font-size: 0.9rem;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.4);
+    box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    padding: 1rem 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(4px);
+    display: inline-block;
+  }
+
+  .hidden {
+    opacity: 0;
+  }
+  
+  .visible {
+    opacity: 1;
+  }
+</style>
+
+<script>
+  const overlay = document.getElementById('msg-overlay');
+  const content = overlay?.querySelector('.msg-content');
+  
+  // Message Pools
+  const MSG_ZERO = [
+    "Null signal detected.",
+    "Void resonance.",
+    "No data found.",
+    "Silence...",
+    "Waiting for input..."
+  ];
+  
+  const MSG_LOW = [
+    "Fragment detected.",
+    "Weak signal resonance.",
+    "Tracing pattern...",
+    "Observation incomplete.",
+    "More data required."
+  ];
+  
+  const MSG_HIGH = [
+    "Clear resonance established.",
+    "Pattern match confirmed.",
+    "High frequency detected.",
+    "Observation cycle active.",
+    "Synchronized with core."
+  ];
+
+  window.addEventListener('core-payment', ((e: CustomEvent) => {
+    if (!overlay || !content) return;
+    
+    const clickCount = e.detail.clickCount;
+    const obsCount = parseInt(localStorage.getItem('celestial_observation_count') || '0', 10);
+    const isTainted = sessionStorage.getItem('celestial_session_tainted') === 'true';
+
+    let text = "";
+
+    // Hidden Gimmick Check
+    if (obsCount === 0 && !isTainted && clickCount >= 7) {
+      text = "Observation count: 0… remarkable. Fastest. This behavior was not modeled.";
+      content.style.borderColor = "#ff4444";
+      content.style.color = "#ffaaaa";
+    } else {
+      // Standard Messages
+      content.style.borderColor = "";
+      content.style.color = "";
+      
+      const pool = (obsCount === 0) ? MSG_ZERO 
+                 : (obsCount < 10) ? MSG_LOW 
+                 : MSG_HIGH;
+                 
+      text = pool[Math.floor(Math.random() * pool.length)];
+      
+      // Meta message chance (First time OR 10% chance)
+      const hasSeenIntro = localStorage.getItem('celestial_intro_shown');
+      
+      if (!hasSeenIntro || Math.random() < 0.1) {
+        text = `[SYSTEM MESSAGE]: Output subject to mutation based on total observation count (${obsCount}).`;
+        localStorage.setItem('celestial_intro_shown', 'true');
+      }
+    }
+
+    content.textContent = text;
+    overlay.classList.remove('hidden');
+    overlay.classList.add('visible');
+
+    // Auto hide
+    setTimeout(() => {
+      overlay.classList.remove('visible');
+      overlay.classList.add('hidden');
+    }, 4000);
+
+  }) as EventListener);
+</script>

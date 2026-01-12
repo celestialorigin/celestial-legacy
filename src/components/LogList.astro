@@ -1,0 +1,37 @@
+---
+import LogCard from './LogCard.astro';
+import type { LogEntry } from '../data/logs';
+
+interface Props {
+  logs: LogEntry[];
+  filterCategory?: string;
+}
+
+const { logs, filterCategory } = Astro.props;
+
+const filteredLogs = filterCategory 
+  ? logs.filter(l => l.category === filterCategory).sort((a,b) => b.date.localeCompare(a.date))
+  : [...logs].sort((a,b) => b.date.localeCompare(a.date));
+---
+
+<div class="log-grid">
+  {filteredLogs.map(log => (
+    <LogCard log={log} />
+  ))}
+  {filteredLogs.length === 0 && <p class="empty-msg">— NO RECORDS DETECTED —</p>}
+</div>
+
+<style>
+  .log-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .empty-msg {
+    text-align: center;
+    opacity: 0.3;
+    font-family: monospace;
+    padding: 4rem;
+    letter-spacing: 0.1em;
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="PREVIEW | DEEP OBSERVATION">
+  <article class="fade-in-section">
+    <h1 style="color: var(--c-accent); letter-spacing: 0.1em; margin-bottom: 2rem;">SAMPLE PREVIEW</h1>
+    
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,100,100,0.15); border-radius: 8px; padding: 2.5rem;">
+        <p style="opacity: 0.5; font-family: monospace; font-size: 0.85rem; margin-bottom: 1.5rem; color: rgba(255,100,100,0.8);">
+            [ CORRUPTED_FRAGMENT_DETECTED ]<br />
+            [ RECONSTRUCTION_INCOMPLETE ]
+        </p>
+        
+        <div style="font-family: monospace; line-height: 2.0; opacity: 0.7; font-size: 0.95rem;">
+            <p style="margin-bottom: 1rem;">
+                OBSERVATION_LOG: ████-042<br />
+                TIMESTAMP: 20██-██-██ ██:██:██<br />
+                OBSERVER: [REDACTED]<br />
+                STATUS: <span style="color: rgba(255,100,100,0.8);">SIGNAL_LOST</span>
+            </p>
+            
+            <p style="margin-bottom: 1rem; opacity: 0.6;">
+                ───────────────────────────────
+            </p>
+            
+            <p style="margin-bottom: 1rem; filter: blur(0.3px);">
+                Subject response detected in ████████ frequency band.<br />
+                Pattern recognition: <span style="opacity: 0.3;">█████████</span> INCOMPLETE<br />
+                Noise contains regularity. Origin: ▓▓▓▓▓▓▓▓<br />
+                Intelligence signature: UNDEFINED<br />
+                Physical law correlation: ░░░░░░ UNRESOLVED
+            </p>
+            
+            <p style="margin-bottom: 1rem; opacity: 0.5;">
+                [ DATA_CORRUPTION: 47% ]<br />
+                [ OBSERVATION_CONTINUITY: BROKEN ]
+            </p>
+            
+            <p style="opacity: 0.4; font-size: 0.85rem; margin-top: 2rem;">
+                ※ Fragment leaked from DEEP_LAYER<br />
+                ※ Complete record: ACCESS_DENIED
+            </p>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <a href="/deep-observation" style="opacity: 0.6; text-decoration: none; font-family: monospace; font-size: 0.85rem;">← RETURN</a>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  /* Glitch effect for corrupted data */
+  @keyframes data-glitch {
+    0%, 100% { opacity: 0.7; }
+    25% { opacity: 0.3; }
+    50% { opacity: 0.9; }
+    75% { opacity: 0.4; }
+  }
+  
+  article div > div {
+    animation: data-glitch 4s ease-in-out infinite;
+  }
+</style>

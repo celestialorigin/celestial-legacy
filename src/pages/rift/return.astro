@@ -1,0 +1,349 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="Harmony Established">
+  <main class="scene-container">
+    <!-- Scene Layer -->
+    <div class="room-visual">
+        <div class="window-light"></div>
+        <!-- Sun Portal: Abstract Light Source -->
+        <a href="/rift/mother?from=/rift/return" class="sun-gate" aria-label="sun-gate" data-sun-gate="1"></a>
+        
+        <!-- Table Removed: Empty Void -->
+        <!-- Implicit presence - warm light -->
+    </div>
+
+    <!-- UI Layer -->
+    <div class="cel-hud-status" data-state="harmony">
+      <span class="cel-hud-label">STATUS:</span>
+      <span class="cel-hud-bars"></span>
+      <span class="cel-hud-text">OBSERVED</span>
+    </div>
+
+    <pre class="cel-hud-log">[LOG_RE]
+
+帰還信号、受理。
+
+▮▮は、向こう側から見ている。
+忘れてはならない。
+
+あなたが、何を選び、何を消費したのか。
+
+------長い旅は終わり、
+そして物語は続いていく------</pre>
+
+    <!-- Exit Anomaly -->
+    <div class="exit-anomaly" aria-label="exit anomaly"></div>
+    <div id="anomaly-overlay" class="anomaly-transition-overlay"></div>
+
+    <!-- Manual Return Trigger -->
+    <!-- Manual Return Trigger (New Robust Implementation) -->
+    <button id="exit-observation" class="exit-observation" type="button">
+      EXIT OBSERVATION
+    </button>
+    <div id="return-toast" class="return-toast hidden"></div>
+  </main>
+</Layout>
+
+<script>
+  // Exit Anomaly Logic
+  const anomaly = document.querySelector('.exit-anomaly');
+  const overlay = document.getElementById('anomaly-overlay');
+  if (anomaly && overlay) {
+      anomaly.addEventListener('click', (e) => {
+          overlay.classList.add('anomaly-active');
+          setTimeout(() => {
+              window.location.href = '/observation';
+          }, 200);
+      });
+  }
+
+  const sunPortal = document.querySelector('.sun-gate');
+  if (sunPortal) {
+      sunPortal.addEventListener('click', (e) => {
+          // Allow default href navigation, or handle transition here if needed.
+          // For now, let the href handle it, this just confirms it exists.
+      });
+      sunPortal.addEventListener('click', (e) => {
+          // Allow default href navigation, or handle transition here if needed.
+          // For now, let the href handle it, this just confirms it exists.
+      });
+  }
+
+  // --- Return Trigger Logic ---
+  // --- Return Trigger Logic (Robust) ---
+  (function () {
+    const btn = document.getElementById('exit-observation');
+    const toast = document.getElementById('return-toast');
+    if (!btn || !toast) return;
+
+    btn.addEventListener('click', (e) => {
+      // Critical: Stop propagation immediately to prevent underlying links from firing
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Disable button to prevent double clicks, but keep visible
+      btn.setAttribute('disabled', 'true');
+      btn.setAttribute('aria-disabled', 'true');
+      btn.style.opacity = '0.5';
+      btn.style.cursor = 'not-allowed';
+
+      // UI Feedback immediately
+      toast.textContent = '観測解除処理を開始…';
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+          toast.textContent = '帰還信号、送信中…';
+      }, 600);
+
+      // Execute Navigation Logic
+      setTimeout(() => {
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get('from');
+
+        // Safety check: allow only relative paths starting with / (not //)
+        const isSafePath = (p) => typeof p === 'string' && p.startsWith('/') && !p.startsWith('//');
+
+        // Logic: 1. valid ?from=  2. fallback /0 (strictly no usage of history.back)
+        let target = '/0';
+        if (isSafePath(from)) {
+            target = from;
+        }
+
+        window.location.href = target;
+      }, 1000); // 1s delay for effect
+    }, { capture: true }); // Capture phase to beat other listeners
+  })();
+
+  // --- Log Text Obfuscation System ---
+  const forbiddenWords = ['母', '父', '神', '創造', '観測者'];
+  const noiseChars = '█▓▒░?■□@#%';
+
+  function generateNoise(length) {
+      let result = '';
+      for (let i = 0; i < length; i++) {
+          result += noiseChars.charAt(Math.floor(Math.random() * noiseChars.length));
+      }
+      return result;
+  }
+
+  function applyNoiseToLog() {
+      const logElement = document.querySelector('.cel-hud-log');
+      if (!logElement) return;
+
+      // Get original HTML content (it looks like plain text in <pre> but let's be safe)
+      let content = logElement.innerHTML;
+
+      forbiddenWords.forEach(word => {
+          // Global replace for each forbidden word
+          const regex = new RegExp(word, 'g');
+          content = content.replace(regex, (match) => {
+              const noise = generateNoise(match.length);
+              return `<span class="log-noise">${noise}</span>`;
+          });
+      });
+
+      logElement.innerHTML = content;
+  }
+
+  // Apply noise immediately
+  applyNoiseToLog();
+</script>
+
+<style>
+  .scene-container {
+    height: 100vh;
+    background: #050510;
+    overflow: hidden;
+    position: relative;
+    font-family: monospace;
+    color: #fff;
+  }
+
+  /* Room Visuals */
+  .room-visual {
+      position: absolute;
+      inset: 0;
+      /* Warm, Golden Hour, Hazy */
+      background: radial-gradient(circle at 50% 30%, #2a1a0a 0%, #000 90%);
+      z-index: 1;
+  }
+  
+  .window-light {
+      position: absolute;
+      top: 10%; right: 10%;
+      width: 200px; height: 300px;
+      /* Bright Golden Light */
+      background: linear-gradient(135deg, rgba(255, 200, 100, 0.2) 0%, transparent 70%);
+      transform: skewX(-20deg);
+      pointer-events: none;
+      filter: blur(10px);
+      box-shadow: 0 0 50px rgba(255, 180, 50, 0.1);
+  }
+
+  /* OLD TABLE & CAKE REMOVED per req */
+  .table { display: none !important; }
+  .cake, .cake.eaten, .crumbs { display: none !important; }
+
+  /* === Sun Visuals (Aesthetic Only) === */
+  .sun-portal-visual {
+      position: absolute;
+      top: 15%; right: 15%;
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      background: rgba(255, 255, 200, 0.4);
+      box-shadow: 0 0 40px rgba(255, 240, 150, 0.6);
+      z-index: 10;
+      transition: all 0.5s ease;
+      pointer-events: none; /* Let gate handle clicks */
+      filter: blur(4px);
+  }
+
+  /* === Sun Gate (Click Target) === */
+  .sun-gate {
+      position: fixed;
+      top: 130px; right: 90px; /* Centered visually */
+      width: 190px; height: 190px; /* Reduced from 240px */
+      border-radius: 50%;
+      z-index: 99999;
+      pointer-events: auto;
+      cursor: pointer;
+      background: rgba(255, 255, 200, 0.02); /* Faint tint */
+      border: 1px solid rgba(255, 255, 240, 0.1); /* Faint outline */
+      box-shadow: 0 0 15px rgba(255, 220, 150, 0.05); /* Faint glow */
+      transition: all 0.5s ease;
+  }
+
+  /* Hover effect linkage: Sun Corona / Halo */
+  .sun-gate:hover {
+      background: rgba(255, 255, 200, 0.05);
+      border-color: rgba(255, 255, 240, 0.4);
+      box-shadow: 
+        0 0 25px 5px rgba(255, 255, 240, 0.3), /* Inner Ring */
+        0 0 60px 20px rgba(255, 220, 150, 0.15); /* Outer Glow */
+  }
+
+  /* --- Persistent Log Style --- */
+  .cel-hud-log {
+      position: fixed;
+      left: 16px; 
+      bottom: 16px;
+      width: auto;
+      max-width: min(520px, 92vw);
+      max-height: 30vh;
+      overflow-y: auto;
+      
+      background: rgba(0, 0, 0, 0.85); /* Slightly darker/warmer for Return? No, keep consistent */
+      border: 1px solid rgba(180, 220, 255, 0.22);
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.15);
+      border-radius: 4px;
+      padding: 12px 16px 12px 12px;
+      
+      font-family: monospace;
+      font-size: clamp(11px, 1.2vw, 13px);
+      line-height: 1.6;
+      color: rgba(220, 235, 255, 0.95);
+      
+      white-space: pre-wrap;
+      z-index: 9999;
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+  }
+
+  .cel-hud-log::before {
+      content: "LOG_RE";
+      display: block;
+      font-size: 10px;
+      color: rgba(0, 255, 255, 0.5);
+      margin-bottom: 4px;
+      letter-spacing: 0.1em;
+      animation: log-pulse 3s infinite;
+  }
+
+  @keyframes log-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+  }
+
+  /* Noise Text Style */
+  :global(.log-noise) {
+      display: inline-block;
+      color: rgba(200, 200, 200, 0.5);
+      text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.15em;
+      opacity: 0.8;
+      font-weight: bold;
+      animation: noise-flicker 3s infinite alternate;
+  }
+
+  @keyframes noise-flicker {
+      0% { opacity: 0.6; text-shadow: 0 0 2px rgba(255, 255, 255, 0.1); }
+      100% { opacity: 0.9; text-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
+  }
+
+  /* Exit Observation Button (Robust) */
+  .exit-observation {
+      position: fixed;
+      right: 28px;
+      bottom: 24px;
+      z-index: 99999; /* Max z-index */
+      pointer-events: auto;
+
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+
+      color: rgba(225, 245, 255, 0.70);
+      background: rgba(0,0,0,0.22);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      padding: 10px 14px;
+
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+
+      cursor: pointer;
+      user-select: none;
+      
+      /* Ensure Visibility */
+      opacity: 1 !important;
+      visibility: visible !important;
+      display: inline-block !important;
+
+      box-shadow: 0 0 22px rgba(120, 220, 255, 0.18);
+      
+      /* Reset button defaults */
+      appearance: none;
+      -webkit-appearance: none;
+      margin: 0;
+      line-height: 1;
+      text-transform: none;
+  }
+
+  .exit-observation:hover {
+      color: rgba(235, 250, 255, 0.92);
+      border-color: rgba(255,255,255,0.32);
+      box-shadow: 0 0 26px rgba(120, 220, 255, 0.28);
+      background: rgba(255, 255, 255, 0.05);
+  }
+
+  .exit-observation:active {
+      transform: translateY(1px);
+  }
+
+  /* Toast */
+  .return-toast {
+      position: fixed;
+      bottom: 70px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      padding: 8px 16px;
+      font-size: 11px;
+      color: rgba(0, 255, 255, 0.9);
+      font-family: monospace;
+      z-index: 10000;
+  }
+  .return-toast.hidden { display: none; }
+</style>

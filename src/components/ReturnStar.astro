@@ -1,0 +1,174 @@
+---
+interface Props {
+  defaultHref: string;
+  position?: 'center' | 'centerLower';
+  label?: string;
+}
+
+const { defaultHref, position = 'center', label = 'RETURN' } = Astro.props;
+
+const from = Astro.url.searchParams.get('from');
+// If 'from' key exists, we decode it. If technically invalid, fallback.
+const backHref = from ? decodeURIComponent(from) : defaultHref;
+
+/* 
+  Style strategy:
+  - Fixed position
+  - z-index high (99999)
+  - pointer-events auto
+*/
+---
+
+<a href={backHref} class:list={["return-star", `return-star--${position}`]} aria-label={label}>
+  <div class="return-star__visual"></div>
+  <span class="return-star__hint">{label}</span>
+</a>
+
+<style>
+  .return-star {
+    position: fixed;
+    z-index: 99999;
+    pointer-events: auto;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Opacity handled by child elements and animations */
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    /* Ensure it doesn't have background blocking unless needed */
+    background: transparent;
+  }
+
+  /* Positioning */
+  .return-star--center {
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  .return-star--centerLower {
+    left: 50%;
+    /* "Do mannaka no sukoshi shitahou" -> approx 62-70% from top, or bottom 25%? */
+    /* User said "centerLower -> top: 62%" in prompt sample */
+    top: 62%; 
+    transform: translate(-50%, -50%);
+  }
+
+  /* Visual Core (The Ring/Star) */
+  .return-star__visual {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.35); /* Brighter border */
+    background: rgba(255, 255, 255, 0.05);
+    /* Constant glow: White/Pale Cyan */
+    box-shadow: 0 0 12px rgba(200, 255, 255, 0.15), inset 0 0 12px rgba(200, 255, 255, 0.05);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    
+    /* Breathing Animation */
+    animation: return-breathe 4s ease-in-out infinite;
+  }
+
+  /* Ripple Effect (New Layer) */
+  .return-star::before {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%; height: 100%;
+      border-radius: 50%;
+      border: 1px solid rgba(200, 255, 255, 0.15);
+      opacity: 0;
+      animation: return-ripple 3s linear infinite;
+      pointer-events: none;
+  }
+
+  /* Inner Dot (Core) */
+  .return-star__visual::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 5px; height: 5px;
+    background: rgba(255, 255, 255, 0.9); /* Brighter core */
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+  }
+
+  /* Text Hint */
+  .return-star__hint {
+    position: absolute;
+    top: -24px;
+    font-family: var(--font-base, ui-monospace, monospace);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transform: translateY(5px);
+    transition: all 0.3s ease;
+    white-space: nowrap;
+    text-shadow: 0 0 5px rgba(200, 255, 255, 0.5);
+    pointer-events: none;
+  }
+
+  /* Hover States */
+  .return-star:hover {
+      cursor: pointer; /* Ensure pointer */
+  }
+
+  .return-star:hover .return-star__visual {
+    border-color: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 0 25px rgba(200, 255, 255, 0.4), inset 0 0 15px rgba(200, 255, 255, 0.2);
+    transform: scale(1.15);
+    animation: none; /* Pause breathing on hover for stability */
+  }
+  
+  .return-star:hover .return-star__visual::after {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 1);
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+
+  .return-star:hover .return-star__hint {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Animations */
+  @keyframes return-breathe {
+      0%, 100% { transform: scale(1); opacity: 0.9; box-shadow: 0 0 12px rgba(200, 255, 255, 0.15); }
+      50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 18px rgba(200, 255, 255, 0.25); }
+  }
+
+  @keyframes return-ripple {
+      0% { width: 100%; height: 100%; opacity: 0.4; border-width: 1px; }
+      100% { width: 220%; height: 220%; opacity: 0; border-width: 0px; }
+  }
+</style>
+
+<script>
+  // Unified Return Logic
+  // Finds all return-stars and applies the history logic
+  const returnStars = document.querySelectorAll('.return-star');
+  returnStars.forEach(star => {
+    star.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetHref = star.getAttribute('href');
+        
+        // logic: window.history.length > 1 -> back(), else -> follow href (fallback)
+        // note: history.length includes the current page, so "1" means no history. 
+        // Some browsers behave differently, but > 1 is the safe check.
+        if (window.history.length > 1) {
+            window.history.back();
+        } else if (targetHref) {
+            window.location.href = targetHref;
+        }
+    });
+  });
+</script>

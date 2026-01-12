@@ -1,0 +1,601 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StarMap from '../components/game/StarMap.astro';
+import MessageOverlay from '../components/game/MessageOverlay.astro';
+import ReturnStar from '../components/ReturnStar.astro';
+
+// Note: Layout usually adds header/footer. For this game, we want clean interface.
+// But we should keep base styles. We can hide header via CSS if needed, 
+// or just use a minimal wrapper if Layout is too heavy.
+// Checking Layout.astro... it has specific header structure. 
+// We will use Layout but hide header/footer via styled slot or CSS override for this page.
+---
+
+<Layout title="Observation" showStars={false}>
+  <main class="observation-game">
+    <StarMap />
+    <MessageOverlay />
+    
+    <MessageOverlay />
+    
+    <!-- Return Star (Center Lower) -->
+    <ReturnStar defaultHref="/0" position="centerLower" />
+
+    <!-- Return Hitbox (Transparent Overlay) -->
+    <!-- Force navigation to /0 (Observer's location) regardless of history -->
+    <a 
+      id="return-hit" 
+      href="/0" 
+      onclick="event.preventDefault(); window.location.href='/0';"
+      aria-label="Return to 0"
+    ></a>
+
+    <!-- Navigation Confirmation Modal (System Style) -->
+    <div id="nav-confirmation" class="nav-confirmation hidden" role="dialog" aria-modal="true">
+      <div class="nav-backdrop"></div>
+      <div class="nav-box">
+        <div class="nav-header">
+          <span class="nav-title">NAVIGATION CONFIRMATION</span>
+          <div class="nav-deco"></div>
+        </div>
+        <div class="nav-body">
+          <p>WORLD_01 への接続を開始しますか？</p>
+          <p class="nav-sub">この操作は観測を開始します。</p>
+        </div>
+        <div class="nav-actions">
+          <button id="nav-btn-yes" class="nav-btn nav-btn--yes">YES</button>
+          <button id="nav-btn-no" class="nav-btn nav-btn--no">NO</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Observer Hitbox (Button for No.001) -->
+    <button id="observer-hitbox" type="button" aria-label="WORLD_01"></button>
+
+  </main>
+</Layout>
+
+<style>
+  /* Override global layout styles to ensure full screen immersion */
+  /* REMOVED: :global(.header) hiding rule to show Global Header */
+  /* Adjusted z-index to sit below the header (z=100) but above standard content */
+  .observation-game {
+    position: fixed;
+    inset: 0;
+    z-index: 50; /* Lowered from 1000 to be below Header(100) */
+    background: #000;
+  }
+
+  /* Robust Hitbox for No.001 (Restored) */
+  #observer-hitbox {
+    position: fixed;
+    left: 50%;
+    top: 8%;
+    transform: translate(-50%, -50%); /* Centered on coordinate */
+    width: 60px; /* Generous touch area */
+    height: 60px;
+    z-index: 2147483647 !important; /* Max Z-Index */
+    cursor: pointer;
+    background: transparent; /* Set to rgba(255,0,0,0.3) for debug */
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    pointer-events: auto !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #return-hit {
+    display: block; /* Ensure it grabs size */
+    position: fixed;
+    left: 50%;
+    top: 62%;
+    transform: translate(-50%, -50%);
+    width: 140px; /* Slightly larger to ensure coverage */
+    height: 140px;
+    z-index: 2147483647 !important; /* Max Z-Index */
+    cursor: pointer;
+    pointer-events: auto !important;
+    background: transparent; /* Debug: rgba(255, 0, 0, 0.3) if needed */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- Navigation Modal Styles --- */
+  .nav-confirmation {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647; /* Match max z-index, relies on DOM order to sit on top */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .nav-confirmation.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  .nav-box {
+    position: relative;
+    width: min(400px, 90vw);
+    background: rgba(10, 15, 25, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.15);
+    padding: 24px;
+    z-index: 10;
+    transform: scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .nav-confirmation.active .nav-box {
+    transform: scale(1);
+  }
+
+  /* Decorative Corner Lines */
+  .nav-box::before {
+    content: '';
+    position: absolute;
+    top: -1px; left: -1px;
+    width: 20px; height: 20px;
+    border-top: 2px solid #00ffff;
+    border-left: 2px solid #00ffff;
+  }
+  .nav-box::after {
+    content: '';
+    position: absolute;
+    bottom: -1px; right: -1px;
+    width: 20px; height: 20px;
+    border-bottom: 2px solid #00ffff;
+    border-right: 2px solid #00ffff;
+  }
+
+  .nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    padding-bottom: 10px;
+  }
+
+  .nav-title {
+    font-family: monospace;
+    color: #00ffff;
+    letter-spacing: 0.1em;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+  }
+
+  .nav-body {
+    color: #e0e0e0;
+    font-family: sans-serif;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+    text-align: center;
+  }
+
+  .nav-sub {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 8px;
+  }
+
+  .nav-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .nav-btn {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-family: monospace;
+    font-size: 1rem;
+    padding: 10px 30px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 100px;
+  }
+
+  .nav-btn--yes:hover {
+    background: rgba(0, 255, 255, 0.15);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  }
+
+  .nav-btn--no:hover {
+    background: rgba(255, 0, 0, 0.15);
+    border-color: #ff4444;
+    color: #ff4444;
+    box-shadow: 0 0 15px rgba(255, 0, 0, 0.2);
+  }
+</style>
+
+<script is:inline>
+(() => {
+  console.log('[obs] Script IIFE started'); // DEBUG
+  document.addEventListener('click', e => console.log('[obs] Global Click:', e.target, e.target.className)); // DEBUG
+
+  const DEBUG = true;
+  const log = (...a) => DEBUG && console.log('[obs]', ...a);
+
+  // -----------------------------
+  // 0) Prophecy Log Box (bottom-left)
+  // -----------------------------
+  function ensureLogBox() {
+    let el = document.querySelector('#prophecy-log');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'prophecy-log';
+      Object.assign(el.style, {
+        position: 'fixed',
+        left: '18px',
+        bottom: '18px',
+        maxWidth: '560px',
+        padding: '12px 14px',
+        background: 'rgba(0,0,0,0.55)',
+        border: '1px solid rgba(0,255,255,0.25)',
+        color: 'rgba(255,255,255,0.92)',
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+        fontSize: '12px',
+        lineHeight: '1.45',
+        borderRadius: '10px',
+        opacity: '0',
+        transform: 'translateY(6px)',
+        transition: 'opacity .15s ease, transform .15s ease',
+        pointerEvents: 'none',
+        zIndex: '9999',
+        backdropFilter: 'blur(4px)',
+        whiteSpace: 'pre-wrap'
+      });
+      document.body.appendChild(el);
+      log('prophecy-log created', !!el);
+    }
+    return el;
+  }
+
+  const box = ensureLogBox();
+
+  function showBox(text) {
+    box.textContent = text;
+    box.style.opacity = '1';
+    box.style.transform = 'translateY(0px)';
+  }
+  function hideBox() {
+    box.style.opacity = '0';
+    box.style.transform = 'translateY(6px)';
+  }
+
+  // -----------------------------
+  // 1) Chaos State (NO undefined)
+  //   - Read from #chaos-star classes
+  // -----------------------------
+  function getChaosState() {
+    const chaos = document.querySelector('#chaos-star, .chaos-star');
+    const cls = chaos?.classList;
+    if (!cls) return 'STABLE';
+
+    // SEALED: you currently use "sealed" / "contained" in various places
+    if (cls.contains('sealed') || cls.contains('contained')) return 'SEALED';
+
+    // HARMONY: choose one class and keep it consistent in your StarMap logic
+    // (If you already have "harmony" somewhere, this will work immediately.)
+    if (cls.contains('harmony') || cls.contains('harmonized') || cls.contains('harmonized-state')) return 'HARMONY';
+
+    return 'STABLE';
+  }
+
+  // -----------------------------
+  // 2) Attribute assignment fallback
+  //   - If stars lack data-attr, infer by backgroundColor
+  // -----------------------------
+  const rgbToAttr = {
+    'rgb(74, 222, 128)': 'wood',   // #4ade80
+    'rgb(248, 113, 113)': 'fire',  // #f87171
+    'rgb(96, 165, 250)': 'water',  // #60a5fa
+    'rgb(168, 162, 158)': 'earth', // #a8a29e
+    'rgb(226, 232, 240)': 'wind',     // ← silver star // metal -> wind
+    'rgb(251, 191, 36)': 'thunder', // #fbbf24
+    'rgb(255, 255, 255)': 'light',
+    'rgb(26, 26, 26)': 'dark',
+    'rgb(192, 132, 252)': 'chaos',
+    'rgb(0, 255, 255)': 'observer'
+  };
+
+  function normalizeAttr(attr) {
+    if (!attr) return '';
+    // alias: metal -> wind
+    if (attr === 'metal') return 'wind';
+    return attr;
+  }
+
+  function assignAttrsIfMissing(stars) {
+    for (const el of stars) {
+      if (el.dataset && el.dataset.attr) continue;
+      const bg = getComputedStyle(el).backgroundColor;
+      const attr = rgbToAttr[bg];
+      if (attr) el.dataset.attr = attr;
+    }
+  }
+
+  // -----------------------------
+  // 3) Noise helpers
+  // -----------------------------
+  const NOISE_CHARS = '▓▒░█▇▆▅▄▃▂▁@#$%&*?/\\|<>[]{}=+~';
+  function addNoise(str, ratio = 0.18) {
+    // replace some chars with noise, but keep readability
+    let out = '';
+    for (const ch of str) {
+      if (ch === '\n') { out += '\n'; continue; }
+      if (ch === ' ') { out += ' '; continue; }
+      if (Math.random() < ratio) {
+        out += NOISE_CHARS[Math.floor(Math.random() * NOISE_CHARS.length)];
+      } else {
+        out += ch;
+      }
+    }
+    return out;
+  }
+
+  function fullNoise(lines = 7, width = 34) {
+    let out = '[----]\n';
+    for (let i = 0; i < lines; i++) {
+      let row = '';
+      for (let j = 0; j < width; j++) row += NOISE_CHARS[Math.floor(Math.random() * NOISE_CHARS.length)];
+      out += row + '\n';
+    }
+    out += '<no signal>';
+    return out;
+  }
+
+  // -----------------------------
+  // 4) Logs (STABLE / SEALED / HARMONY)
+  //   - STABLE: father / "異邦者" trace (readable + noise)
+  //   - SEALED: prophecy (your current noise prophecy)
+  //   - HARMONY: full noise only
+  // -----------------------------
+  const stableLogs = {
+    wood:  `【痕跡_木】\n観測記録に不整合。\nこの座標には、すでに通過痕がある。\n\n旅は開始されていない。\nしかし、足跡は存在している。\n\n彼は住人ではない。\n――異邦の残響。`,
+    fire:  `【痕跡_火】\n熱源の増減に説明不能な空白。\n燃焼でも破壊でもない。\n\n彼は炎に触れていない。\nだが炎は、彼を避けた。\n\nこの場所で彼は何も変えていない。\nそれでも記録は、変質している。`,
+    water: `【痕跡_水】\n流動記録に逆流現象。\n水面は一度だけ乱れている。\n\n彼は飲まず、渡らず、\nただ境界に立っていた。\n\nここは滞在地ではない。\n通過点のひとつ。`,
+    earth: `【痕跡_土】\n地層に不自然な空白層。\n崩落でも堆積でもない。\n\n彼は掘っていない。\nだが地形は、彼を記録している。\n\n通過は短時間。\n影響は長期に残留。`,
+    wind:  `【痕跡_風】\n大気流向に瞬間的な停止点。\n風が止まったのではない。\n風が、避けた。\n\n彼は留まっていない。\nだが全方位が、一度だけ歪んだ。\n\n沈黙は、その名残。`,
+    thunder:`【痕跡_雷】\n放電パターンに同期失敗。\n雷は彼に落ちていない。\n\nだが一瞬だけ、\n因果が接続されなかった。\n\n記録不能な「すれ違い」。`,
+    light: `【痕跡_光】\n光量データに自己遮蔽。\n彼は影を持たない。\nだが影は、彼を持った。\n\nここで初めて\n「観測された可能性」がある。\nそれでも姿は存在しない。`,
+    dark:  `【痕跡_闇】\n遮断領域に、さらに遮断。\n闇の内部に空白がある。\n\n闇は彼を認識できていない。\n存在が、深度を持たない。`,
+    chaos: `【痕跡_混沌】\n中心座標に未登録の通過痕。\n封印はまだ成立していない。\n\n異邦の残響は\n境界線をなぞるように巡回している。\n\n目的は記録されていない。\n移動だけが、断続的に検出される。`
+  };
+
+  // あなたが今使ってる「封印後の予言ノイズ」をここにまとめる（例）
+  // ※ここは既存の文章に置き換えてOK（“全文ノイズっぽい予言”）
+  const sealedLogs = {
+    wood:  `【予言_木】……観測不能……\n████░░▒▒▓▓░░…\n「まだ芽は折れていない。」`,
+    fire:  `【予言_火】……観測不能……\n▓▒░█▇▆▅▄▃▂▁…\n「代償は炎より静かに落ちる。」`,
+    water: `【予言_水】……観測不能……\n▒▒▒░░▓▓▓██░░…\n「沈むものが、浮かぶ。」`,
+    earth: `【予言_土】……観測不能……\n██▓▒░░░▒▓██░…\n「墓標は最初から立っている。」`,
+    wind:  `【予言_風】……観測不能……\n░▓█░▓█░▓█░▓█…\n「風は名を奪う。」`,
+    thunder:`【予言_雷】……観測不能……\n▇▆▅▄▃▂▁██…\n「接続は一度だけ断たれる。」`,
+    light: `【予言_光】……観測不能……\n████████████…\n「白が白を覆う。」`,
+    dark:  `【予言_闇】……観測不能……\n░░░░░░░░░░░░…\n「闇は助けるために逸脱する。」`,
+    chaos: `【予言_混沌】……観測不能……\n@#$%&*?/\\|<>…\n「封印は完成する。だが——」`
+  };
+
+  function getLogText(attr) {
+    const state = getChaosState();  // STABLE / SEALED / HARMONY
+    const a = normalizeAttr(attr);
+
+    // observer-star は除外（ログ不要なら）
+    if (a === 'observer') return null;
+
+    if (state === 'HARMONY') {
+      return fullNoise(7, 34);
+    }
+
+    if (state === 'SEALED') {
+      const base = sealedLogs[a] || sealedLogs.chaos;
+      // sealedは「全文ノイズっぽい」なら、さらにノイズ強め
+      return addNoise(base, 0.35);
+    }
+
+    // STABLE（封印前）：読める + ほどよく欠ける
+    const base = stableLogs[a] || stableLogs.chaos;
+    return addNoise(base, 0.14);
+  }
+
+  // -----------------------------
+  // 5) Hover behavior
+  // -----------------------------
+  let currentStar = null;
+
+  function bindHover(stars) {
+    log('Binding listeners. Found stars:', stars.length);
+
+    for (const el of stars) {
+      // exclude secret / return etc
+      if (el.classList.contains('secret-star') || el.classList.contains('return-star')) continue;
+
+      el.addEventListener('mouseenter', () => {
+        currentStar = el;
+        const txt = getLogText(el.dataset.attr);
+        if (txt) showBox(txt);
+      });
+
+      el.addEventListener('mouseleave', () => {
+        currentStar = null;
+        hideBox();
+      });
+    }
+  }
+
+  function init() {
+    log('script loaded');
+
+    const stars = [...document.querySelectorAll('.star')];
+    assignAttrsIfMissing(stars);
+
+    // metal→wind もここで補正しておく（保険）
+    for (const s of stars) {
+      if (s.dataset.attr === 'metal') s.dataset.attr = 'wind';
+    }
+
+    bindHover(stars);
+    bindClick(stars);
+
+    // 状態変化（封印/解除/調和）が後で起きても、次hoverで内容が変わるのでOK
+    // もし「状態変化した瞬間にログ内容も更新したい」ならここでタイマー監視もできる
+  }
+  
+  function bindClick(stars) {
+    // ---------------------------------------------------------
+    // 1) DEBUG: Verify prophecy-log existence immediately
+    // ---------------------------------------------------------
+    const logBox = document.getElementById('prophecy-log');
+    console.log('[W01] prophecy-log element', logBox);
+
+    // ---------------------------------------------------------
+    // 2) Target Setup
+    // ---------------------------------------------------------
+    const targetStar = document.querySelector('.observer-star');
+    
+    // Disable original star interaction to prevent double-firing or default links
+    if (targetStar) {
+        targetStar.style.pointerEvents = 'none'; // DISABLE ORIGINAL
+    }
+    
+    // Hitbox Setup
+    const targetHitbox = document.getElementById('observer-hitbox');
+    console.log('[W01] targetHitbox found:', targetHitbox);
+
+    const modal = document.getElementById('nav-confirmation');
+    const btnYes = document.getElementById('nav-btn-yes');
+    const btnNo = document.getElementById('nav-btn-no');
+    const backdrop = modal?.querySelector('.nav-backdrop');
+
+    const TARGET_URL = '/tbd-01';
+
+    // ---------------------------------------------------------
+    // 3) Modal Helpers
+    // ---------------------------------------------------------
+    const showModal = () => {
+      if (!modal) return;
+      modal.classList.remove('hidden');
+      void modal.offsetWidth; // Force reflow
+      modal.classList.add('active');
+    };
+
+    const hideModal = () => {
+      if (!modal) return;
+      modal.classList.remove('active');
+      setTimeout(() => modal.classList.add('hidden'), 300);
+    };
+
+    const proceed = () => {
+      // Always store history (even if persistence check is disabled for display)
+      localStorage.setItem('celestial_world01_unlocked', 'true');
+      console.log('[W01] YES clicked - Navigating...');
+      window.location.href = TARGET_URL; // RESTORED
+    };
+
+    // Re-bind modal events safely
+    const newBtnYes = btnYes?.cloneNode(true);
+    const newBtnNo = btnNo?.cloneNode(true);
+    const newBackdrop = backdrop?.cloneNode(true);
+    
+    if (btnYes && newBtnYes) btnYes.parentNode.replaceChild(newBtnYes, btnYes);
+    if (btnNo && newBtnNo) btnNo.parentNode.replaceChild(newBtnNo, btnNo);
+    if (backdrop && newBackdrop) backdrop.parentNode.replaceChild(newBackdrop, backdrop);
+
+    newBtnYes?.addEventListener('click', proceed);
+    newBtnNo?.addEventListener('click', hideModal);
+    newBackdrop?.addEventListener('click', hideModal);
+    
+    // ESC key support
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && modal?.classList.contains('active')) hideModal();
+    });
+
+
+    // ---------------------------------------------------------
+    // 4) Click Handler (Hitbox Only)
+    // ---------------------------------------------------------
+    // NOTE: This hitbox is ON TOP of the star. It handles the click solely.
+    if (targetHitbox) {
+      targetHitbox.addEventListener('click', (e) => {
+        // A. Stop everything
+        e.preventDefault();
+        e.stopPropagation();
+
+        console.log('W01 CLICK');
+
+        // B. Force Log Display (Fallback Logic)
+        let logEl = document.getElementById('prophecy-log');
+        if (!logEl) {
+            console.warn('[W01] prophecy-log missing, creating fallback...');
+            logEl = document.createElement('div');
+            logEl.id = 'prophecy-log';
+            document.body.appendChild(logEl);
+        }
+
+        // Apply critical styles directly to ensure visibility
+        Object.assign(logEl.style, {
+            position: 'fixed',
+            left: '18px',
+            bottom: '18px',
+            maxWidth: '560px',
+            padding: '12px 14px',
+            background: 'rgba(0,0,0,0.85)', // Darker for visibility
+            border: '1px solid #00ffff',
+            color: '#fff',
+            fontFamily: 'monospace',
+            fontSize: '12px',
+            lineHeight: '1.45',
+            borderRadius: '10px',
+            opacity: '1', // FORCE VISIBLE
+            transform: 'none', // FORCE NO TRANSFORM
+            pointerEvents: 'none',
+            zIndex: '99999', // FORCE TOP
+            display: 'block',
+            whiteSpace: 'pre-wrap',
+            textShadow: '0 0 2px #000'
+        });
+
+        const logText = `WORLD_01 / STATUS: OPEN\n\n観測は開始された。\nこの星は、最初の記録へと接続されている。\n……準備はできているか？\n\n[LINK ESTABLISHED]\n[TRACE: ORIGIN_NODE]`;
+        logEl.textContent = logText;
+        
+        console.log('SHOW LOG', logEl);
+
+        // C. Delay 400ms
+        setTimeout(() => {
+            // D. Show Modal
+            console.log('OPEN MODAL');
+            showModal();
+        }, 400);
+      });
+    } else {
+      console.warn('[obs] Target Hitbox not found');
+    }
+  }
+
+  // DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();
+</script>
+

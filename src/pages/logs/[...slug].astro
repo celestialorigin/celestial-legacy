@@ -1,0 +1,87 @@
+---
+// import { getCollection } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+
+export async function getStaticPaths() {
+  // const logs = await getCollection('logs');
+  return []; // Disabled due to missing content collection
+}
+
+const { entry } = Astro.props; // Stub
+// const { Content } = await entry.render();
+---
+
+<Layout title={`${entry.data.title} | CELESTIAL`}>
+  <article>
+    <section>
+        <header style="margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 1rem;">
+            <h1 style="color: var(--c-accent); letter-spacing: 0.05em; font-size: 1.5rem;">{entry.data.title}</h1>
+            <p style="opacity: 0.6; font-size: 0.9em; margin: 0;">
+                {entry.data.date.toISOString().split('T')[0]} / 
+                <span style="font-size: 0.9em; opacity: 0.8; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 2px 6px; text-transform: uppercase; margin-left: 8px;">
+                    {entry.data.category}
+                </span>
+            </p>
+            {entry.data.internalOnly && (
+                <p style="opacity: 0.7; font-size: 0.85em; margin: 0.5rem 0 0 0; color: #ff8888; letter-spacing: 0.02em;">この記録はCELESTIAL内部にのみ保存され、外部には公開されない（INTERNAL ONLY）</p>
+            )}
+            {entry.data.summary && (
+                <p style="margin-top: 1rem; font-size: 0.95em; opacity: 0.8; line-height: 1.6; border-left: 2px solid rgba(255,255,255,0.2); padding-left: 1rem;">{entry.data.summary}</p>
+            )}
+        </header>
+
+        <section style="margin-bottom: 3rem;">
+            <!-- Content Wrapper -->
+             <div style="background: rgba(255,255,255,0.03); padding: 1.5rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                {entry.data.internalOnly && (
+                    <header style="margin-bottom: 1.5rem; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 0.5rem;">
+                      <h4 style="margin: 0; color: var(--c-accent); font-size: 1.1em;">内部保管記録</h4>
+                    </header>
+                )}
+                
+                <div class="log-body">
+                    <Content />
+                </div>
+
+                {entry.data.footer && (
+                    <footer class="log-footer">
+                        {entry.data.footer}
+                    </footer>
+                )}
+             </div>
+        </section>
+
+        <div style="margin-top: 40px; text-align: left; display: flex; gap: 20px; opacity: 0.6; font-size: 0.9em;">
+            <a href="/archive" style="color: #fff; text-decoration: none;">← ARCHIVE</a>
+            <a href="/logs" style="color: #fff; text-decoration: none;">← LOGS</a>
+            <a href="/" style="color: #fff; text-decoration: none;">← HOME</a>
+        </div>
+    </section>
+  </article>
+</Layout>
+
+<style>
+/* =========================
+   📝 Log Entry Body
+========================= */
+.log-body {
+  font-family: serif;
+  opacity: 0.9;
+  line-height: 2.0;
+  margin-bottom: 2rem;
+}
+
+.log-body p {
+  margin-bottom: 1em;
+}
+
+.log-footer {
+  text-align: right;
+  opacity: 0.55;
+  font-size: 0.85em;
+  letter-spacing: 0.1em;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+</style>

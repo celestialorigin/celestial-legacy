@@ -1,0 +1,90 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LogHeader from '../components/LogHeader.astro';
+import LogList from '../components/LogList.astro';
+import DimensionalRift from '../components/DimensionalRift.astro';
+import { logs } from '../data/logs';
+
+const categoryId = "OBSERVERS";
+const internalId = "OBS-OBSR-001";
+---
+
+<Layout title={`${categoryId} | CELESTIAL`}>
+  <article class="category-page container fade-in-section">
+    <div class="glass-panel main-content">
+      <LogHeader 
+        displayId={categoryId}
+        internalId={internalId}
+        type="ENTITY"
+        status="STABLE"
+      />
+      
+      <div class="category-body">
+        <div class="intro-area">
+          <p class="intro-text">観測体記録。境界領域に存在する個体および現象の追跡・解析データ。</p>
+        </div>
+
+        <div class="logs-section">
+          <h2 class="section-title">ENTITY LOGS</h2>
+          <LogList logs={logs} filterCategory="observers" />
+        </div>
+      </div>
+
+      <div class="footer-nav">
+        <a href="/archive" class="back-link">← VIEW MASTER ARCHIVE</a>
+      </div>
+    </div>
+  </article>
+  
+  <DimensionalRift position="right" href="/rift" variant="past" />
+</Layout>
+
+<style>
+  .category-page {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 0 20px;
+  }
+  .main-content {
+    padding: 3rem;
+    border-radius: 12px;
+  }
+  .intro-text {
+    opacity: 0.6;
+    font-size: 0.95rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 2rem;
+  }
+  .logs-section {
+    margin-top: 4rem;
+  }
+  .section-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    opacity: 0.4;
+    margin-bottom: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  .empty-msg {
+    text-align: center;
+    opacity: 0.3;
+    font-family: monospace;
+    padding: 4rem;
+  }
+  .footer-nav {
+    margin-top: 5rem;
+    text-align: center;
+  }
+  .back-link {
+    opacity: 0.4;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: opacity 0.3s;
+  }
+  .back-link:hover {
+    opacity: 1;
+    color: var(--c-accent);
+  }
+</style>

@@ -1,0 +1,143 @@
+---
+---
+
+<a href="/rift/return" class="rift-return-nav" id="rift-return-link" aria-label="Return to previous layer">
+  <span class="rift-return-scanline"></span>
+  <span class="rift-return-text">RETURN</span>
+</a>
+
+<div id="rift-return-toast" class="rift-return-toast hidden">
+  NAVIGATING...
+</div>
+
+<script>
+  const link = document.getElementById('rift-return-link') as HTMLAnchorElement;
+  const toast = document.getElementById('rift-return-toast');
+  
+  if (link && toast) {
+    // 1. Determine Destination
+    const params = new URLSearchParams(window.location.search);
+    const fromPath = params.get('from');
+    
+    // Default fallback
+    let targetUrl = '/rift/return';
+    
+    // Validate 'from' path (must be relative and safe)
+    if (fromPath && fromPath.startsWith('/') && !fromPath.includes('//')) {
+        targetUrl = fromPath;
+    } else {
+        // Higher level fallbacks if needed, but for now /rift/return is the hub
+        // If we are ALREADY at /rift/return (unlikely for this component), go to /0
+        if (window.location.pathname === '/rift/return') {
+            targetUrl = '/0';
+        }
+    }
+    
+    // Update href for hover/SEO
+    link.href = targetUrl;
+    
+    // 2. Handle Click
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Show Toast
+        toast.classList.remove('hidden');
+        
+        // Brief delay/effect
+        setTimeout(() => {
+            window.location.href = targetUrl;
+        }, 600);
+    });
+  }
+</script>
+
+<style>
+  .rift-return-nav {
+    position: fixed;
+    top: 90px; /* Header (70px) + 20px */
+    right: 20px;
+    z-index: 1000;
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 4px;
+    
+    text-decoration: none;
+    overflow: hidden;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
+  }
+  
+  .rift-return-text {
+    font-family: monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: rgba(220, 235, 255, 0.7);
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.2);
+    position: relative;
+    z-index: 2;
+  }
+  
+  .rift-return-scanline {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 2px;
+    background: rgba(0, 255, 255, 0.3);
+    opacity: 0;
+    animation: scan 2s linear infinite;
+  }
+  
+  .rift-return-nav:hover {
+    background: rgba(0, 20, 40, 0.8);
+    border-color: rgba(0, 255, 255, 0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
+  }
+  
+  .rift-return-nav:hover .rift-return-text {
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+  }
+  
+  .rift-return-nav:hover .rift-return-scanline {
+    opacity: 0.5;
+  }
+  
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(500%); }
+  }
+  
+  /* Toast overlay */
+  .rift-return-toast {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    
+    background: rgba(0, 0, 0, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.4);
+    color: rgba(0, 255, 255, 0.9);
+    
+    padding: 1rem 2rem;
+    font-family: monospace;
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    z-index: 9999;
+    
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    animation: toast-in 0.3s ease-out;
+  }
+  
+  .rift-return-toast.hidden {
+    display: none;
+  }
+  
+  @keyframes toast-in {
+    from { opacity: 0; transform: translate(-50%, -45%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+  }
+</style>

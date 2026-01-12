@@ -1,0 +1,43 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LogHeader from '../components/LogHeader.astro';
+import { getLog } from '../lib/getLog';
+
+const log = getLog("join");
+
+if (!log) return Astro.redirect("/404");
+---
+
+<Layout title={`${log.title} | CELESTIAL`}>
+  <article class="log-page container fade-in-section" style="max-width: 800px; margin: 4rem auto;">
+    <div class="glass-panel" style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 3rem; text-align: center;">
+      <LogHeader 
+        displayId={log.displayId}
+        internalId={log.internalId}
+        type={log.type}
+        status={log.status}
+      />
+      
+      <div style="margin-top: 3rem;">
+        <div style="margin-bottom: 2rem; opacity: 0.5;">
+          <svg style="width: 32px; height: 32px; fill: var(--c-accent);" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 17a2 2 0 100-4 2 2 0 000 4z"/>
+            <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6z"/>
+          </svg>
+        </div>
+        <h1 style="color: var(--c-accent); letter-spacing: 0.1em; margin-bottom: 0.5rem; font-size: 2rem;">{log.title}</h1>
+        <p style="opacity: 0.6; font-size: 0.9rem; margin-bottom: 3rem; border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 1rem;">{log.subtitle}</p>
+        
+        <div style="line-height: 2; opacity: 0.9; text-align: left; max-width: 500px; margin: 0 auto;">
+          {log.paragraphs.map(p => (
+            <p style="margin-bottom: 1.5rem;">{p}</p>
+          ))}
+        </div>
+      </div>
+
+      <div style="margin-top: 5rem; display: flex; justify-content: center; font-size: 0.85rem; opacity: 0.5;">
+        <a href="/" style="text-decoration: none; color: inherit;">← HOMEへ戻る</a>
+      </div>
+    </div>
+  </article>
+</Layout>

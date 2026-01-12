@@ -1,0 +1,46 @@
+name: Auto Update & Deploy
+
+on:
+  schedule:
+    - cron: '0 */6 * * *' # 6時間おき
+  workflow_dispatch: # 手動実行用
+
+jobs:
+  update-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Pull External Feeds
+        run: node scripts/pull-feeds.mjs
+
+      - name: Commit updates
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add src/data/updates.json
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto-update: Received Logs [skip ci]" && git push)
+
+      - name: Build Astro
+        run: npm run build
+
+      - name: Deploy to Xserver
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./dist/
+          server-dir: ${{ secrets.FTP_REMOTE_DIR }}
+          dangerous-clean-slate: false # 必要に応じてtrueに（差分削除）

@@ -1,0 +1,410 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RiftReturn from '../../components/RiftReturn.astro';
+---
+
+<Layout title="????????">
+  <main class="scene-container white-world mother-scope">
+    <!-- Visual Layer: The White Boundary -->
+    <div class="corridor-visual">
+        <div class="light-sea"></div>
+        <div class="particles"></div>
+        <div class="silhouettes">
+            <div class="figure f1"></div>
+            <div class="figure f2"></div>
+            <div class="figure leader" id="leader-figure" role="button" tabindex="0"></div>
+            <div class="figure f3"></div>
+            <div class="figure f4" id="mother-figure" role="button" tabindex="0"></div>
+        </div>
+        <div class="foreground-mist"></div>
+        <div class="faint-scanlines"></div>
+    </div>
+
+    <!-- UI Layer -->
+    <div class="cel-hud-status" data-state="unknown">
+        <span class="cel-hud-label">STATUS:</span>
+        <span class="cel-hud-bars"></span>
+        <span class="cel-hud-text glitched-status">????????</span>
+    </div>
+
+    <!-- Return Nav -->
+    <RiftReturn />
+
+    <div class="log-area">
+        <div class="cel-hud-log" id="main-log">
+            <div id="default-msg">
+                [LOG_??] 未識別領域。<br><br>
+                ここにある光は、いずれの記録にも属さない。<br><br>
+                それらの向かう先は、<br>
+                この観測圏では決定されない。<br><br>
+                このシステムは、<br>
+                それを言葉として認識できない。
+            </div>
+            <div id="secret-msg" class="hidden">
+                <span class="alert">[干渉検出]</span><br><br>
+                ……覗き見は、あまり褒められたものではない。<br><br>
+                けれど、<br>
+                ここに辿り着いたという事実そのものが、<br>
+                すでに“観測”だ。<br><br>
+                ……気にする必要はない。<br><br>
+                続けなさい。<br>
+                あなたたちのままで。
+            </div>
+            <div id="mother-msg" class="hidden">
+                <span class="alert">[観測ログ：未分類]</span><br><br>
+                ……もう、声は届かない。<br><br>
+                それでも、見てしまう。<br>
+                見ないという選択肢だけは、最初から存在しなかった。<br><br>
+                あの背中が遠ざかっていくたび、<br>
+                私は、確かに“始まり”だったのだと知る。<br><br>
+                名前を与えたのも、<br>
+                歩き方を教えたのも、<br>
+                世界を恐れることを教えたのも――<br><br>
+                ……いいえ。<br>
+                これは記録ではない。<br><br>
+                ただの、残響。
+            </div>
+        </div>
+        
+        <!-- Exit Anomaly (White World Logic) -->
+        <div class="exit-anomaly" aria-label="exit anomaly"></div>
+    </div>
+    <div id="anomaly-overlay" class="anomaly-transition-overlay"></div>
+  </main>
+</Layout>
+
+<script>
+  // Exit Anomaly Logic (Mother -> Return to Sun Portal/Return Page)
+  const anomaly = document.querySelector('.exit-anomaly');
+  const overlay = document.getElementById('anomaly-overlay');
+  
+  if (anomaly && overlay) {
+    anomaly.addEventListener('click', (e) => {
+        overlay.classList.add('anomaly-active');
+        setTimeout(() => {
+            window.location.href = '/rift/return';
+        }, 200);
+    });
+  }
+
+  // Interaction Logic
+  const leader = document.getElementById('leader-figure');
+  const defaultMsg = document.getElementById('default-msg');
+  const secretMsg = document.getElementById('secret-msg');
+  const nameGlitch = document.getElementById('name-glitch');
+  
+  let glitchInterval;
+
+  if (leader && defaultMsg && secretMsg) {
+      const startInteraction = () => {
+          defaultMsg.classList.add('hidden');
+          secretMsg.classList.remove('hidden');
+          // Glitch removed for this timeline
+      };
+
+      const endInteraction = () => {
+          secretMsg.classList.add('hidden');
+          defaultMsg.classList.remove('hidden');
+          stopGlitch();
+      };
+
+      leader.addEventListener('mouseenter', startInteraction);
+      leader.addEventListener('mouseleave', endInteraction);
+      leader.addEventListener('touchstart', (e) => { e.preventDefault(); startInteraction(); });
+      leader.addEventListener('touchend', endInteraction);
+      leader.addEventListener('touchend', endInteraction);
+  }
+
+  // Mother Figure Interaction
+  const motherFigure = document.getElementById('mother-figure');
+  const motherMsg = document.getElementById('mother-msg');
+
+  if (motherFigure && defaultMsg && motherMsg) {
+      const startMotherInteraction = () => {
+          defaultMsg.classList.add('hidden');
+          motherMsg.classList.remove('hidden');
+      };
+
+      const endMotherInteraction = () => {
+          motherMsg.classList.add('hidden');
+          defaultMsg.classList.remove('hidden');
+      };
+
+      motherFigure.addEventListener('mouseenter', startMotherInteraction);
+      motherFigure.addEventListener('mouseleave', endMotherInteraction);
+      motherFigure.addEventListener('touchstart', (e) => { e.preventDefault(); startMotherInteraction(); });
+      motherFigure.addEventListener('touchend', endMotherInteraction);
+  }
+
+  function startGlitch() {
+      if (glitchInterval) clearInterval(glitchInterval);
+      const clearFrames = ['Lucia', 'Lwsia', 'L..ia', 'Luc..', 'L.c.a', '.....'];
+      
+      glitchInterval = setInterval(() => {
+          if (!nameGlitch) return;
+          if (Math.random() < 0.04) { // Slightly increased chance
+              const hint = clearFrames[Math.floor(Math.random() * clearFrames.length)];
+              // Intense Blood Red for the L, stark against the white
+              const color = 'rgba(230, 0, 0, 1)'; 
+              nameGlitch.innerHTML = `<span style="color:${color}; text-shadow:0 0 4px rgba(255,0,0,0.4)">L</span>${hint.substring(1)}`;
+              
+              // Hold hint slightly longer
+              setTimeout(() => {
+                 // Return to mask
+                 if (nameGlitch) nameGlitch.innerHTML = `<span style="color:${color}; text-shadow:0 0 4px rgba(255,0,0,0.4)">L</span>${getMask()}`;
+              }, 120); 
+          } else {
+              // Standard Masked Frame
+              // "L" is always distinct
+              nameGlitch.innerHTML = `<span style="color:rgba(230, 0, 0, 1)">L</span>${getMask()}`;
+          }
+      }, 70); // 60 -> 70ms for slightly better readability
+  }
+
+  function stopGlitch() {
+      if (glitchInterval) clearInterval(glitchInterval);
+  }
+
+  function getMask() {
+      const masks = ['▮', '▯', '█', '?'];
+      let res = '';
+      for(let i=0; i<4; i++) {
+          res += masks[Math.floor(Math.random() * masks.length)];
+      }
+      return res;
+  }
+</script>
+
+<style>
+  /* === White World Theme === */
+  .scene-container.white-world {
+      height: 100vh;
+      background: #fdfaf6; /* Ivory White Base */
+      overflow: hidden;
+      position: relative;
+      font-family: monospace;
+      padding: 0;
+      color: #111; /* Dark text for contrast against white */
+  }
+
+  .cel-hud-text {
+      color: inherit;
+  }
+  
+  /* Log Legibility Updates */
+  .cel-hud-log {
+      color: #111;
+      background: rgba(250, 250, 255, 0.4); /* Subtle white backing to blur background details */
+      border: 1px solid rgba(0,0,0,0.05); /* Very faint border */
+      backdrop-filter: blur(4px);
+      padding: 1rem;
+      border-radius: 4px;
+      /* Ensure text shadow for extreme contrast */
+      text-shadow: 0 0 10px rgba(255,255,255,0.8);
+      
+      /* Darker backing requested? User said: "background: rgba(20,20,24,.55)" 
+         BUT also said "white world". 
+         "背景は神聖な白のままでOK...文字が消えるのでログコンテナに半透明の濃い下地を戻す"
+         Okay, applying dark backing as requested.
+      */
+      background: rgba(20, 20, 24, 0.55);
+      color: #eef; /* Light text on dark backing */
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      text-shadow: 0 0 2px rgba(0,0,0,0.5);
+  }
+
+  .cel-hud-status {
+       /* Status bar also needs legibility? usually distinct. */
+       color: #333;
+  }
+
+  /* === Backlit Visuals === */
+  .corridor-visual {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+  }
+  
+  /* The Light Sea */
+  .light-sea {
+      position: absolute;
+      inset: -50%;
+      background: radial-gradient(circle at 50% 50%, 
+        rgba(255, 250, 240, 1) 0%, 
+        rgba(255, 245, 225, 1) 30%, 
+        rgba(255, 230, 230, 1) 60%, 
+        rgba(240, 240, 250, 1) 100%
+      );
+      filter: blur(60px);
+      animation: breatheLight 10s infinite ease-in-out;
+  }
+
+  /* GRAIN: Film grain feel for "Memory" */
+  .corridor-visual::after {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      opacity: 0.15;
+      animation: noiseShift 0.5s steps(10) infinite;
+      pointer-events: none;
+      z-index: 15;
+      mix-blend-mode: multiply;
+  }
+  @keyframes noiseShift { 0% { transform: translate(0,0); } 100% { transform: translate(10px, 10px); } }
+
+  .foreground-mist {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, transparent 60%);
+      z-index: 10;
+      pointer-events: none;
+      filter: blur(20px);
+  }
+  
+  .faint-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(0,0,0,0) 0px,
+        rgba(0,0,0,0) 2px,
+        rgba(0,0,0,0.02) 3px,
+        rgba(0,0,0,0) 4px
+      );
+      pointer-events: none;
+      z-index: 12;
+      opacity: 0.15; /* Reduced opacity, let grain take over */
+  }
+
+  /* Silhouettes - Sinking Shadows */
+  .silhouettes {
+      position: absolute;
+      top: 55%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 100%; height: 100%;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 50px; /* Increased gap for better separation */
+      z-index: 5;
+  }
+
+  .figure {
+      width: 40px; height: 120px;
+      /* Not solid black. Translucent dark. */
+      background: rgba(60, 45, 45, 0.2);
+      border-radius: 20px 20px 0 0;
+      position: relative;
+      
+      /* Strong Rim Light / Backlight */
+      box-shadow: 
+        0 0 15px rgba(255, 255, 255, 0.9),
+        inset 0 0 10px rgba(255, 230, 200, 0.7);
+      
+      /* Blur edges slightly to sink into light */
+      filter: blur(3px); 
+      
+      opacity: 0.9;
+      transform-origin: bottom center;
+      animation: sway 5s infinite ease-in-out alternate;
+  }
+  
+  /* Head */
+  .figure::before {
+      content: '';
+      position: absolute;
+      top: -25px; left: 5px;
+      width: 30px; height: 35px;
+      background: rgba(60, 45, 45, 0.2);
+      border-radius: 50%;
+      box-shadow: 
+        0 0 12px rgba(255, 255, 255, 0.9),
+        inset 0 0 6px rgba(255, 230, 200, 0.6);
+  }
+
+  /* Specific Figures - More Organic */
+  .figure.f1 { height: 110px; transform: scale(0.9) translateY(10px) translateX(-10px); animation-delay: 0s; }
+  .figure.f2 { height: 125px; transform: scale(0.95) translateX(-5px); animation-delay: 1s; }
+  /* Leader is central */
+  .figure.f3 { height: 115px; transform: scale(0.92) translateY(5px) translateX(5px); animation-delay: 2.5s; }
+  .figure.f3 { height: 115px; transform: scale(0.92) translateY(5px) translateX(5px); animation-delay: 2.5s; }
+  .figure.f4 { 
+      height: 105px; 
+      transform: scale(0.88) translateY(15px) translateX(10px); 
+      animation-delay: 0.5s;
+      /* Interactive props */
+      pointer-events: auto;
+      cursor: help;
+      transition: all 0.3s ease;
+  }
+  
+  #mother-figure:hover {
+      background: rgba(100, 80, 80, 0.3);
+      filter: blur(1px) brightness(1.2);
+  }
+
+  /* LEADER - Interactive */
+  .figure.leader {
+      width: 50px; height: 140px;
+      z-index: 20;
+      pointer-events: auto;
+      cursor: help;
+      /* Slightly more defined */
+      background: rgba(80, 50, 50, 0.25);
+  }
+  .figure.leader::before { width: 40px; height: 45px; top: -35px; left: 5px; background: rgba(80, 50, 50, 0.25); }
+  
+  .figure.leader:hover {
+      background: rgba(100, 60, 60, 0.35);
+      filter: blur(1px); /* Sharpen on hover */
+      box-shadow: 0 0 30px rgba(255, 200, 200, 0.6);
+  }
+
+  /* Particles - Dust Motes in Light */
+  .particles {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px);
+      background-size: 60px 60px;
+      opacity: 0.5;
+      animation: floatUp 25s linear infinite;
+      z-index: 4;
+      pointer-events: none;
+  }
+
+  @keyframes breatheLight { 
+    0%, 100% { transform: scale(1); opacity: 0.9; } 
+    50% { transform: scale(1.05); opacity: 1; } 
+  }
+  @keyframes sway { 0% { transform: rotate(-1.5deg); } 100% { transform: rotate(1.5deg); } }
+  @keyframes floatUp { from { background-position: 0 0; } to { background-position: 0 -500px; } }
+
+  /* Glitch Text Animation (Keep local) */
+  .cel-hud-status[data-state="unknown"] .cel-hud-text.glitched-status {
+      /* Base color handled by global scope, animation here */
+      animation: glitchTextLight 0.3s infinite;
+  }
+  @keyframes glitchTextLight { 
+      0% { opacity: 0.9; transform: translate(0); } 
+      10% { opacity: 0.5; transform: translate(-1px, 1px); color: rgba(200, 50, 50, 0.8); } 
+      20% { opacity: 1; transform: translate(0); } 
+  }
+
+  .log-area {
+      /* Position overrides if needed */
+  }
+  
+  .alert { animation: pulseRedKey 2s infinite; }
+  @keyframes pulseRedKey { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.6; } }
+
+  /* Utils */
+  .hidden { display: none; }
+  
+  /* Ensure secret msg inherits legibility */
+  #secret-msg {
+      /* No specific extra styles needed if parent .cel-hud-log handles it */
+  }
+</style>

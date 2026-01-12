@@ -1,0 +1,377 @@
+[
+  {
+    "id": "sig-youtube-20260108-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Build AI Apps with Genkit Go",
+    "date": "2026-01-08T18:02:12.000Z",
+    "url": "https://www.youtube.com/watch?v=zqCeeQteWGc",
+    "media": {
+      "embed": "https://www.youtube.com/embed/zqCeeQteWGc",
+      "thumb": "https://i.ytimg.com/vi/zqCeeQteWGc/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=zqCeeQteWGc>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20260108-002",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Poor explanations of a software developer's job",
+    "date": "2026-01-08T05:00:33.000Z",
+    "url": "https://www.youtube.com/shorts/NWeH5ghpKrw",
+    "media": {
+      "embed": "https://www.youtube.com/embed/NWeH5ghpKrw",
+      "thumb": "https://i.ytimg.com/vi/NWeH5ghpKrw/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/NWeH5ghpKrw>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20260105-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Why does this sometimes print nonsense or crash? Go!",
+    "date": "2026-01-05T14:00:25.000Z",
+    "url": "https://www.youtube.com/shorts/9vt-0vs3PuM",
+    "media": {
+      "embed": "https://www.youtube.com/embed/9vt-0vs3PuM",
+      "thumb": "https://i.ytimg.com/vi/9vt-0vs3PuM/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/9vt-0vs3PuM>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251231-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Stop your agents from wasting tokens! (6 Tips)",
+    "date": "2025-12-31T00:00:05.000Z",
+    "url": "https://www.youtube.com/shorts/340PsKwb07E",
+    "media": {
+      "embed": "https://www.youtube.com/embed/340PsKwb07E",
+      "thumb": "https://i.ytimg.com/vi/340PsKwb07E/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/340PsKwb07E>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251224-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Fix your wandering agents via spec-driven development",
+    "date": "2025-12-24T00:01:23.000Z",
+    "url": "https://www.youtube.com/shorts/zn4mPqPPDFQ",
+    "media": {
+      "embed": "https://www.youtube.com/embed/zn4mPqPPDFQ",
+      "thumb": "https://i.ytimg.com/vi/zn4mPqPPDFQ/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/zn4mPqPPDFQ>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251220-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Give AI agents live access to your browser with the Chrome DevTools MCP server",
+    "date": "2025-12-20T00:00:12.000Z",
+    "url": "https://www.youtube.com/shorts/DH4Z2ohoaeo",
+    "media": {
+      "embed": "https://www.youtube.com/embed/DH4Z2ohoaeo",
+      "thumb": "https://i.ytimg.com/vi/DH4Z2ohoaeo/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/DH4Z2ohoaeo>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251219-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Just in from the news desk 📰: Google Antigravity",
+    "date": "2025-12-19T17:12:42.000Z",
+    "url": "https://www.youtube.com/shorts/tMbbeKT178s",
+    "media": {
+      "embed": "https://www.youtube.com/embed/tMbbeKT178s",
+      "thumb": "https://i.ytimg.com/vi/tMbbeKT178s/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/tMbbeKT178s>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251219-002",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Introducing FunctionGemma",
+    "date": "2025-12-19T14:00:30.000Z",
+    "url": "https://www.youtube.com/watch?v=-Tgc_9uYJLI",
+    "media": {
+      "embed": "https://www.youtube.com/embed/-Tgc_9uYJLI",
+      "thumb": "https://i.ytimg.com/vi/-Tgc_9uYJLI/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=-Tgc_9uYJLI>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251219-003",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Keras Recommenders: reliable, state-of-the-art recommendations for ranking and retrieval",
+    "date": "2025-12-19T05:01:12.000Z",
+    "url": "https://www.youtube.com/watch?v=uV3gymO9K98",
+    "media": {
+      "embed": "https://www.youtube.com/embed/uV3gymO9K98",
+      "thumb": "https://i.ytimg.com/vi/uV3gymO9K98/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=uV3gymO9K98>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251219-004",
+    "source": "youtube",
+    "kind": "video",
+    "title": "What's on the newsdesk for Google Developers this December? Take a peek!",
+    "date": "2025-12-19T00:00:57.000Z",
+    "url": "https://www.youtube.com/shorts/o6JMB4awpOQ",
+    "media": {
+      "embed": "https://www.youtube.com/embed/o6JMB4awpOQ",
+      "thumb": "https://i.ytimg.com/vi/o6JMB4awpOQ/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/o6JMB4awpOQ>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251218-001",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Gemini 3 and Gen UI in Google Search",
+    "date": "2025-12-18T20:39:01.000Z",
+    "url": "https://www.youtube.com/watch?v=AqyclkRBSe4",
+    "media": {
+      "embed": "https://www.youtube.com/embed/AqyclkRBSe4",
+      "thumb": "https://i.ytimg.com/vi/AqyclkRBSe4/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=AqyclkRBSe4>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251218-002",
+    "source": "youtube",
+    "kind": "video",
+    "title": "IC vs. Manager: Which path is right for you?",
+    "date": "2025-12-18T20:01:01.000Z",
+    "url": "https://www.youtube.com/shorts/xWHOimdLEYA",
+    "media": {
+      "embed": "https://www.youtube.com/embed/xWHOimdLEYA",
+      "thumb": "https://i.ytimg.com/vi/xWHOimdLEYA/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/xWHOimdLEYA>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251218-003",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Individual contributor or manager: choosing your engineering path",
+    "date": "2025-12-18T17:00:02.000Z",
+    "url": "https://www.youtube.com/watch?v=1HVPYqCnJlo",
+    "media": {
+      "embed": "https://www.youtube.com/embed/1HVPYqCnJlo",
+      "thumb": "https://i.ytimg.com/vi/1HVPYqCnJlo/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=1HVPYqCnJlo>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251218-004",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Rewinding back to our favorites launches from 2025 - Google Developer News (End of Year Edition)",
+    "date": "2025-12-18T14:01:27.000Z",
+    "url": "https://www.youtube.com/watch?v=lT3YDLqllVI",
+    "media": {
+      "embed": "https://www.youtube.com/embed/lT3YDLqllVI",
+      "thumb": "https://i.ytimg.com/vi/lT3YDLqllVI/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/watch?v=lT3YDLqllVI>"
+      ]
+    }
+  },
+  {
+    "id": "sig-youtube-20251218-005",
+    "source": "youtube",
+    "kind": "video",
+    "title": "Build an app easily with Nano Banana in Google AI Studio",
+    "date": "2025-12-18T05:00:44.000Z",
+    "url": "https://www.youtube.com/shorts/eY5ZR1yrhrk",
+    "media": {
+      "embed": "https://www.youtube.com/embed/eY5ZR1yrhrk",
+      "thumb": "https://i.ytimg.com/vi/eY5ZR1yrhrk/hqdefault.jpg"
+    },
+    "auto": true,
+    "observer": "Lukia",
+    "template": "SIGNAL",
+    "narrative": {
+      "header": "OBSERVATION SIGNAL RECEIVED",
+      "lines": [
+        "外界信号を受信。",
+        "記録を開始します。",
+        "観測チャネル：YOUTUBE",
+        "対象：VIDEO",
+        "座標：<https://www.youtube.com/shorts/eY5ZR1yrhrk>"
+      ]
+    }
+  }
+]

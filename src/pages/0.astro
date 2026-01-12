@@ -1,0 +1,455 @@
+---
+import Layout from '../layouts/Layout.astro';
+const title = "0";
+---
+
+<Layout title={title} starPattern="home" showStars={true}>
+  <!-- Main content wrapper to ensure separation from header -->
+  <div class="void">
+      <!-- 背景画像レイヤ: 観測者たち -->
+      <div class="observer-image"></div>
+
+      <!-- 重厚なビネット -->
+      <div class="void-vignette"></div>
+
+      <!-- ✅ 左上の日本語（すでに戻っている想定） -->
+      <div class="jp-left">観測者は1人とは限らない</div>
+
+      <!-- ✅ 右下の日本語（これが消えてたやつ：復活） -->
+      <div class="jp-bottom">観測者はすべての物語にいるかもしれない</div>
+
+      <div class="trace" style="top: 32%; left: 10%;">
+         Trace: <span class="observer-trigger">Unknown</span><br>
+         Status: <span class="observer-trigger">Silent</span>
+      </div>
+
+      <div class="trace" style="top: 45%; right: 15%; text-align: right;">
+         Observation Probe: <span class="observer-trigger">Active</span><br>
+         Signal: <span class="observer-trigger" style="color: #6ee7b7;">Stable</span>
+      </div>
+
+      <!-- Central "Return" / "Home" Trigger -->
+      <div class="return-container" style="position: absolute; top: 60%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10;">
+         <a href="/" class="return-center" aria-label="Return to Origin">
+             RETURN
+         </a>
+      </div>
+      <!-- ✅ World 01 Enter Star (復活) -->
+      <a
+        href="/observation"
+        class="world1-star"
+        aria-label="Enter World 01"
+      ></a>
+      <!-- Sealed Stars (Migrated from Observation) -->
+      <div class="sealed-star" data-world="02" style="top: 20%; left: 20%; --d: 0s;"></div>
+      <div class="sealed-star" data-world="03" style="top: 25%; right: 25%; --d: 1s;"></div>
+      <div class="sealed-star" data-world="04" style="top: 60%; left: 15%; --d: 2s;"></div>
+      <div class="sealed-star" data-world="05" style="top: 70%; right: 20%; --d: 3s;"></div>
+      <div class="sealed-star" data-world="06" style="top: 15%; left: 50%; --d: 4s;"></div>
+      <div class="sealed-star" data-world="07" style="top: 80%; left: 45%; --d: 1.5s;"></div>
+      <!-- ✅ Dimensional Rift Trigger (to observation-log-000) -->
+      <a href="/observation-log-000" class="rift-trigger" aria-label="Dimensional Rift: Observation Log 000">
+         <div class="rift-core"></div>
+         <div class="rift-glitch"></div>
+      </a>
+      <!-- Dimensional Rift Trigger (無効のまま：404に飛ばさない) -->
+      {/*
+      <a href="/dormant" class="rift-trigger" aria-label="Project Dormant Sky">
+        <div class="rift-core"></div>
+        <div class="rift-glitch"></div>
+      </a>
+      */}
+  </div>
+</Layout>
+
+<script>
+  // Unified Click Handler
+  document.querySelectorAll(".sealed-star, [data-world]").forEach((btn) => {
+     btn.addEventListener("click", (e) => {
+       const world = btn.dataset.world;
+       if (!world) return;
+
+       if (world === "01") return;
+
+       e.preventDefault();
+       e.stopPropagation();
+
+       console.log("[sealed click]", world);
+       const msg = buildLockedMessage(world);
+       showProphecy(msg, 4500);
+     });
+  });
+
+  // --- Prophecy Log System (Glitch Ver.) ---
+  let prophecyHideTimer = null;
+
+  const GLITCH_CHARS = "▓▒░█#%&@$*+/\\|=<>~^";
+  const NOISE_KANA = "ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉ";
+  const HEX = "0123456789ABCDEF";
+
+  function mulberry32(seed) {
+    return function () {
+      let t = (seed += 0x6D2B79F5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function pick(rng, s) {
+    return s[Math.floor(rng() * s.length)];
+  }
+
+  function corruptLine(line, rng, intensity = 0.25, mode = "mix") {
+    const arr = line.split("");
+    for (let i = 0; i < arr.length; i++) {
+      if (rng() < intensity) {
+        if (mode === "replace") arr[i] = pick(rng, GLITCH_CHARS);
+        else if (mode === "kana") arr[i] = pick(rng, NOISE_KANA);
+        else if (mode === "drop") arr[i] = "";
+        else if (mode === "hex") arr[i] = pick(rng, HEX);
+        else {
+          const m = rng();
+          if (m < 0.25) arr[i] = pick(rng, GLITCH_CHARS);
+          else if (m < 0.5) arr[i] = pick(rng, NOISE_KANA);
+          else if (m < 0.75) arr[i] = "";
+          else arr[i] = pick(rng, HEX);
+        }
+      }
+    }
+    return arr.join("");
+  }
+
+  function glitchBlock(rng, width = 22) {
+    let s = "";
+    for (let i = 0; i < width; i++) s += pick(rng, "▓▒░");
+    return s;
+  }
+
+  function noisySeparator(rng) {
+    const sets = ["─━", "═≡", "░▒▓", "/\\|", "⋯…"];
+    const set = sets[Math.floor(rng() * sets.length)];
+    let s = "";
+    for (let i = 0; i < 36; i++) s += set[Math.floor(rng() * set.length)];
+    return s;
+  }
+
+  function jitterSpaces(str, rng, rate = 0.06) {
+    return str.split("").map(ch => (rng() < rate ? ch + " " : ch)).join("");
+  }
+
+  const WORLD_NOISE_PROFILE = {
+    "02": { mode: "drop", intensity: 0.22, blocks: 1 },
+    "03": { mode: "replace", intensity: 0.28, blocks: 2 },
+    "04": { mode: "kana", intensity: 0.24, blocks: 1 },
+    "05": { mode: "mix", intensity: 0.18, blocks: 0, jitter: 0.10 },
+    "06": { mode: "hex", intensity: 0.26, blocks: 2 },
+    "07": { mode: "mix", intensity: 0.30, blocks: 3 },
+  };
+
+  function buildLockedMessage(world) {
+    const seedVal = Number(world) * 1000 + (Date.now() % 100000);
+    const rng = mulberry32(seedVal);
+
+    const p = WORLD_NOISE_PROFILE[world] || { mode: "mix", intensity: 0.22, blocks: 1 };
+    const stamp = "SEED:" + (Date.now() % 100000);
+
+    const header =
+`WORLD_${world} / STATUS: LOCKED  ${stamp}
+
+まだ、この世界に至る道は開いていないようだ・・・。
+他の世界の観測が終わった時、その世界への道は開かれるかもしれない・・・・
+`;
+
+    let lines = [
+      "[NO DATA]",
+      "[SIGNAL LOST]",
+      "TRACE: /boot/observer/sector/" + world + "/",
+      "PACKET: " + pick(rng, HEX) + pick(rng, HEX) + "-" + pick(rng, HEX) + pick(rng, HEX),
+      ".... / .... / .... / ....",
+    ];
+
+    if (world === "06") {
+      lines = [
+        "[NO DATA]",
+        "[SIGNAL LOST]",
+        "DUMP: 0x" + pick(rng, HEX) + pick(rng, HEX) + pick(rng, HEX) + pick(rng, HEX),
+        "ADDR: 0x" + pick(rng, HEX) + pick(rng, HEX) + pick(rng, HEX) + pick(rng, HEX),
+        ".... / .... / .... / ....",
+      ];
+    }
+
+    const corrupted = lines.map((ln, idx) => {
+      const k = 1 + idx * 0.35;
+      const intensity = Math.min(0.55, p.intensity * k);
+      return corruptLine(ln, rng, intensity, p.mode);
+    });
+
+    for (let i = 0; i < (p.blocks || 0); i++) {
+      const at = Math.floor(rng() * corrupted.length);
+      corrupted.splice(at, 0, glitchBlock(rng, 24 + Math.floor(rng() * 10)));
+    }
+
+    corrupted.unshift(noisySeparator(rng));
+    corrupted.push(noisySeparator(rng));
+
+    let body = corrupted.join("\n");
+    if (p.jitter) body = jitterSpaces(body, rng, p.jitter);
+
+    return header + "\n" + body;
+  }
+
+  function ensureProphecyLog() {
+    let el = document.getElementById("prophecy-log");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "prophecy-log";
+      document.body.appendChild(el);
+    }
+    Object.assign(el.style, {
+      position: "fixed",
+      left: "18px",
+      bottom: "18px",
+      maxWidth: "560px",
+      padding: "12px 14px",
+      borderRadius: "12px",
+      background: "rgba(0,0,0,0.85)",
+      border: "1px solid rgba(255,255,255,0.15)",
+      color: "rgba(255,255,255,0.9)",
+      fontFamily: "monospace",
+      fontSize: "12px",
+      lineHeight: "1.45",
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word",
+      zIndex: "999999",
+      pointerEvents: "none",
+      opacity: "0",
+      transform: "translateY(6px)",
+      transition: "opacity 220ms ease, transform 220ms ease",
+      display: "block"
+    });
+    return el;
+  }
+
+  function showProphecy(text, ms = 4500) {
+    const el = ensureProphecyLog();
+    el.textContent = text;
+
+    requestAnimationFrame(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0px)";
+    });
+
+    if (prophecyHideTimer) clearTimeout(prophecyHideTimer);
+
+    prophecyHideTimer = window.setTimeout(() => {
+      if (el) {
+        el.style.opacity = "0";
+        el.style.transform = "translateY(6px)";
+      }
+    }, ms);
+  }
+</script>
+
+<style>
+  /* Local overrides for Void visual */
+  .void {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .observer-image {
+    position: absolute;
+    inset: 0;
+    background: url("/images/observers.png") center / cover no-repeat;
+    pointer-events: none !important;
+    opacity: 0.78;
+    filter: brightness(0.62) contrast(1.25) saturate(0.95);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.85) 100%);
+  }
+
+  .void-vignette {
+    position: absolute;
+    inset: 0;
+    pointer-events: none !important;
+    background: radial-gradient(circle at 50% 40%, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 100%);
+  }
+
+  .trace {
+    position: absolute;
+    max-width: 42rem;
+    font-size: 15px;
+    line-height: 2.0;
+    letter-spacing: 0.06em;
+    color: rgba(235, 246, 255, 0.80);
+    text-shadow: 0 0 12px rgba(140, 210, 255, 0.18);
+    opacity: 0.72;
+    transform: translateZ(0);
+  }
+  .observer-trigger { pointer-events: auto; font-weight: bold; }
+
+  /* ✅ 左上の日本語 */
+  .jp-left {
+    position: absolute;
+    left: 14%;
+    top: 22%;
+    color: rgba(240,245,255,0.72);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 10px rgba(140,210,255,0.12);
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  /* ✅ 右下の日本語（復活させたい） */
+  .jp-bottom {
+    position: absolute;
+    left: 64%;
+    bottom: 16%;
+    color: rgba(240,245,255,0.72);
+    font-size: 14px;
+    letter-spacing: 0.08em;
+    text-shadow: 0 0 10px rgba(140,210,255,0.12);
+    pointer-events: none;
+    z-index: 12;
+  }
+
+  .return-center {
+    display: inline-block;
+    padding: 1rem 3rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.8);
+    font-family: monospace;
+    letter-spacing: 0.2em;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    background: rgba(0,0,0,0.5);
+  }
+  .return-center:hover {
+    border-color: #fff;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  /* Sealed Stars */
+  .sealed-star {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: #444;
+    border-radius: 50%;
+    box-shadow: 0 0 4px #444;
+    cursor: not-allowed;
+    animation: flicker 4s infinite alternate;
+    animation-delay: var(--d);
+    z-index: 11;
+  }
+  .sealed-star:hover {
+    background: #f00;
+    box-shadow: 0 0 8px #f00;
+  }
+  @keyframes flicker { 0% { opacity: 0.4; } 100% { opacity: 0.8; } }
+
+  /* Rift Trigger (今は無効) */
+  .rift-trigger {
+    position: absolute;
+    bottom: 10%; right: 10%;
+    width: 40px; height: 40px;
+    display: flex; justify-content: center; align-items: center;
+    z-index: 50;
+  }
+  .rift-core { width: 10px; height: 10px; background: #c084fc; border-radius: 50%; box-shadow: 0 0 10px #c084fc; }
+  .rift-trigger:hover .rift-core { transform: scale(1.5); transition: transform 0.3s; }
+  /* ✅ World 01 Enter Star (clickable) */
+.world1-star {
+  position: absolute;
+  /* ここは後で微調整してOK（星の位置） */
+  top: 58%;
+  left: 33%;
+
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+
+  background: #4ade80;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.7);
+
+  opacity: 0.9;
+  z-index: 9999;
+  pointer-events: auto;
+
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+.world1-star:hover {
+  opacity: 1;
+  transform: scale(1.25);
+  box-shadow: 0 0 18px rgba(74, 222, 128, 0.9);
+  cursor: pointer;
+}
+/* =========================
+   🌑 Dimensional Rift (Black / Bottom)
+========================= */
+
+.rift-trigger{
+  position: absolute;
+  left: 50%;
+  bottom: -12px;
+  transform: translateX(-50%);
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  pointer-events: auto;
+}
+
+.rift-core{
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    #000000 20%,
+    #0a0a0a 45%,
+    #1a1a1a 65%,
+    rgba(255,255,255,0.35) 100%
+  );
+  box-shadow:
+    0 0 6px rgba(255,255,255,0.35),
+    0 0 18px rgba(0,0,0,0.9),
+    inset 0 0 6px rgba(0,0,0,1);
+  animation: rift-pulse 3.2s ease-in-out infinite;
+}
+
+.rift-glitch{
+  position: absolute;
+  inset: -14px;
+  border-radius: 999px;
+  border: 1px dashed rgba(255,255,255,0.35);
+  opacity: 0.45;
+  filter: blur(0.4px);
+  animation: rift-spin 4.8s linear infinite;
+  pointer-events: none;
+}
+
+.rift-trigger:hover .rift-core{
+  transform: scale(1.45);
+  box-shadow:
+    0 0 10px rgba(255,255,255,0.6),
+    0 0 30px rgba(0,0,0,1);
+}
+
+@keyframes rift-pulse{
+  0%,100%{ transform: scale(1); opacity: 0.75; }
+  50%{ transform: scale(0.85); opacity: 1; }
+}
+
+@keyframes rift-spin{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
+}
+</style>

@@ -1,0 +1,156 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import RiftReturn from '../../components/RiftReturn.astro';
+---
+
+<Layout title="Fragment: Past-15">
+  <main class="scene-container">
+    <!-- Scene Layer -->
+    <div class="room-visual">
+        <div class="window-light"></div>
+        <div class="table">
+            <div class="cake fancy"></div>
+        </div>
+        <!-- No child silhouette - EMPTINESS -->
+    </div>
+
+    <!-- UI Layer -->
+    <div class="cel-hud-status" data-state="seal">
+      <span class="cel-hud-label">STATUS:</span>
+      <span class="cel-hud-bars"></span>
+      <span class="cel-hud-text">CONTAINED</span>
+    </div>
+
+    <RiftReturn />
+
+    <pre class="cel-hud-log">[LOG_15]
+
+対象は存在しない。
+
+それでも、何かは置かれている。
+あるいは、置き換えられた。
+
+誰もいない部屋。
+だが、不在こそが存在を示している。
+
+------長い旅が始まり、
+そして物語は続いていく------</pre>
+
+    <!-- Exit Anomaly -->
+    <div class="exit-anomaly" aria-label="exit anomaly"></div>
+    <div id="anomaly-overlay" class="anomaly-transition-overlay"></div>
+  </main>
+</Layout>
+
+<script>
+  const anomaly = document.querySelector('.exit-anomaly');
+  const overlay = document.getElementById('anomaly-overlay');
+  
+  if (anomaly && overlay) {
+      anomaly.addEventListener('click', (e) => {
+          // Ejection Effect
+          overlay.classList.add('anomaly-active');
+          setTimeout(() => {
+              window.location.href = '/observation';
+          }, 200);
+      });
+  }
+</script>
+
+<style>
+  .scene-container {
+    height: 100vh;
+    background: #050510;
+    overflow: hidden;
+    position: relative;
+    font-family: monospace;
+    color: #fff;
+  }
+
+  /* Room Visuals */
+  .room-visual {
+      position: absolute;
+      inset: 0;
+      /* Cold, Deep blue-black, High Contrast */
+      background: radial-gradient(circle at 40% 20%, #0a0a1a 0%, #000 100%);
+      z-index: 1;
+  }
+  
+  .window-light {
+      position: absolute;
+      top: 10%; right: 10%;
+      width: 200px; height: 300px;
+      /* Sharp, Cold/Cyan Light */
+      background: linear-gradient(135deg, rgba(180,255,255,0.08) 0%, transparent 60%);
+      transform: skewX(-20deg);
+      pointer-events: none;
+      filter: blur(2px);
+  }
+
+  .table {
+      position: absolute;
+      bottom: 20%; left: 50%;
+      transform: translateX(-50%);
+      width: 60%; height: 2px;
+      background: #333;
+      /* Sharp shadow */
+      box-shadow: 10px 20px 0 rgba(0,0,0,0.95);
+  }
+  
+  .cake.fancy {
+      position: absolute;
+      bottom: 2px; left: 55%; 
+      width: 50px; height: 40px;
+      /* Pristine, White */
+      background: #f5f5f5;
+      border-radius: 2px;
+      box-shadow: 0 0 5px rgba(200,255,255,0.2);
+  }
+  .cake.fancy::before { /* Decoration - Red Dot */
+      content: ''; position: absolute; top: -4px; left: 50%; transform: translateX(-50%);
+      width: 8px; height: 8px;
+      background: #ef4444; border-radius: 50%;
+  }
+
+  /* --- Persistent Log Style --- */
+  .cel-hud-log {
+      position: fixed;
+      left: 16px; 
+      bottom: 16px;
+      width: auto;
+      max-width: min(520px, 92vw);
+      max-height: 30vh;
+      overflow-y: auto;
+      
+      background: rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(180, 220, 255, 0.22);
+      box-shadow: 0 0 20px rgba(0, 100, 255, 0.15);
+      border-radius: 4px;
+      padding: 12px 16px 12px 12px;
+      
+      font-family: monospace;
+      font-size: clamp(11px, 1.2vw, 13px);
+      line-height: 1.6;
+      color: rgba(220, 235, 255, 0.95);
+      
+      white-space: pre-wrap;
+      z-index: 9999;
+      pointer-events: auto;
+      backdrop-filter: blur(4px);
+  }
+
+  .cel-hud-log::before {
+      content: "LOG_15";
+      display: block;
+      font-size: 10px;
+      color: rgba(0, 255, 255, 0.5);
+      margin-bottom: 4px;
+      letter-spacing: 0.1em;
+      animation: log-pulse 3s infinite;
+  }
+
+  @keyframes log-pulse {
+      0%, 100% { opacity: 0.4; }
+      50% { opacity: 0.8; }
+  }
+</style>

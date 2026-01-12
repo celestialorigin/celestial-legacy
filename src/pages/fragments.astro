@@ -1,0 +1,89 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LogHeader from '../components/LogHeader.astro';
+import PrimarySource from '../components/PrimarySource.astro';
+import LogList from '../components/LogList.astro';
+import { logs } from '../data/logs';
+
+const categoryId = "FRAGMENTS";
+const internalId = "OBS-FRAG-001";
+---
+
+<Layout title={`${categoryId} | CELESTIAL`}>
+  <article class="category-page container fade-in-section">
+    <div class="glass-panel main-content">
+      <LogHeader 
+        displayId={categoryId}
+        internalId={internalId}
+        type="VISUAL"
+        status="STABLE"
+      />
+      
+      <div class="category-body">
+        <PrimarySource 
+          label="PRIMARY SOURCE : FRAGMENTS / EXTERNAL VISUAL CHANNEL"
+          text="断片記録リポジトリ：画像データや視覚化されたノイズの集積。外部メディア（pixiv）にて高精細データを公開中。"
+          buttonLabel="VIEW REPOSITORY →"
+          url="https://www.pixiv.net/users/122573778"
+        />
+
+        <div class="logs-section">
+          <h2 class="section-title">OBSERVATION LOGS</h2>
+          <LogList logs={logs} filterCategory="fragments" />
+        </div>
+      </div>
+
+      <div class="footer-nav">
+        <a href="/archive" class="back-link">← VIEW MASTER ARCHIVE</a>
+      </div>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .category-page {
+    max-width: 900px;
+    margin: 4rem auto;
+    padding: 0 20px;
+  }
+  .main-content {
+    padding: 3rem;
+    border-radius: 12px;
+  }
+  .category-body {
+    margin-top: 3rem;
+  }
+  .logs-section {
+    margin-top: 6rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 4rem;
+  }
+  .section-title {
+    font-size: 0.9rem;
+    letter-spacing: 0.3em;
+    opacity: 0.4;
+    margin-bottom: 2.5rem;
+    font-weight: bold;
+    text-align: center;
+  }
+  .empty-msg {
+    text-align: center;
+    opacity: 0.3;
+    font-family: monospace;
+    padding: 4rem;
+  }
+  .footer-nav {
+    margin-top: 5rem;
+    text-align: center;
+  }
+  .back-link {
+    opacity: 0.4;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: opacity 0.3s;
+  }
+  .back-link:hover {
+    opacity: 1;
+    color: var(--c-accent);
+  }
+</style>

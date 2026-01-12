@@ -1,0 +1,157 @@
+---
+import { getSummary } from '../utils/templates';
+import type { LogEntry } from '../data/logs';
+
+interface Props {
+  log: LogEntry;
+}
+
+const { log } = Astro.props;
+const summary = log.summary || getSummary(log.category, "");
+---
+
+<a href={log.href} class="log-card glass-panel fade-in-section">
+  <div class="card-header">
+    <span class="log-id">[ {log.id} ]</span>
+    <span class="log-date">{log.date}</span>
+  </div>
+  
+  <div class="card-body">
+    <div class="badge-wrapper">
+      <span class="log-badge">{log.badge}</span>
+    </div>
+    <h3 class="log-title">{log.title}</h3>
+    <p class="log-summary">{summary}</p>
+  </div>
+  
+  <div class="card-footer">
+    <span class="btn-detail-ornament">
+      ANALYZE DATA →
+    </span>
+  </div>
+</a>
+
+<style>
+  .log-card {
+    display: block;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+  
+  .log-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 2px;
+    height: 100%;
+    background: var(--c-accent);
+    opacity: 0.3;
+    transition: opacity 0.3s;
+  }
+
+  .log-card:hover, .log-card:focus-visible {
+    background: rgba(var(--c-accent-rgb), 0.03);
+    border-color: rgba(var(--c-accent-rgb), 0.3);
+    transform: translateX(8px);
+    outline: none;
+  }
+
+  .log-card:focus-visible {
+    box-shadow: 0 0 0 2px var(--c-accent);
+  }
+
+  .log-card:hover::before, .log-card:focus-visible::before {
+    opacity: 1;
+    box-shadow: 0 0 10px var(--c-accent-glow);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+    font-family: monospace;
+    font-size: 0.8rem;
+  }
+
+  .log-id {
+    opacity: 0.4;
+    letter-spacing: 0.1em;
+  }
+
+  .log-date {
+    opacity: 0.6;
+    color: var(--c-accent);
+  }
+
+  .card-body {
+    position: relative;
+  }
+
+  .badge-wrapper {
+    margin-bottom: 0.75rem;
+  }
+
+  .log-badge {
+    font-size: 0.65rem;
+    font-weight: bold;
+    color: var(--c-accent);
+    opacity: 0.8;
+    letter-spacing: 0.1em;
+    padding: 2px 8px;
+    border: 1px solid rgba(var(--c-accent-rgb), 0.3);
+    border-radius: 2px;
+    background: rgba(var(--c-accent-rgb), 0.05);
+  }
+
+  .log-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    color: #fff;
+    letter-spacing: 0.05em;
+    transition: color 0.3s;
+  }
+
+  .log-card:hover .log-title {
+    color: var(--c-accent);
+  }
+
+  .log-summary {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    opacity: 0.7;
+    margin-bottom: 2rem;
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .btn-detail-ornament {
+    display: inline-block;
+    padding: 0.5rem 1.2rem;
+    border: 1px solid rgba(var(--c-accent-rgb), 0.3);
+    color: var(--c-accent);
+    font-size: 0.8rem;
+    border-radius: 2px;
+    transition: all 0.3s;
+    letter-spacing: 0.1em;
+  }
+
+  .log-card:hover .btn-detail-ornament,
+  .log-card:focus-visible .btn-detail-ornament {
+    background: rgba(var(--c-accent-rgb), 0.1);
+    border-color: var(--c-accent);
+    box-shadow: 0 0 10px var(--c-accent-glow);
+  }
+</style>

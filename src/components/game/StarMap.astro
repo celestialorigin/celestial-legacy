@@ -1,0 +1,993 @@
+---
+import CoreStar from './CoreStar.astro';
+
+// Star Configuration (Standardized)
+const stars = [
+  // s1: Wood / Green (Top Left)
+  { id: 'wood', x: 12, y: 15, color: '#4ade80', label: 'Wood', type: 'attribute' },
+  // s2: Fire / Red (Top Right)
+  { id: 'fire', x: 82, y: 12, color: '#f87171', label: 'Fire', type: 'attribute' },
+  // s3: Water / Blue (Right Mid)
+  { id: 'water', x: 85, y: 48, color: '#60a5fa', label: 'Water', type: 'attribute' },
+  // s4: Earth / Brown (Right Bottom)
+  { id: 'earth', x: 88, y: 88, color: '#a8a29e', label: 'Earth', type: 'attribute' },
+  // s5: Metal(Silver) / Wind (Left Bottom)
+  { id: 'metal', x: 18, y: 78, color: '#e2e8f0', label: 'Metal', type: 'attribute' },
+  // s6: Thunder / Yellow (Left Mid)
+  { id: 'thunder', x: 8, y: 62, color: '#fbbf24', label: 'Thunder', type: 'attribute' },
+  
+  // Trinity - Light/Dark
+  { id: 'light', x: 30, y: 32, color: '#fff', label: 'Light', size: '0.7rem', border: '1px solid rgba(255,255,255,0.5)', type: 'trinity' },
+  { id: 'dark', x: 46, y: 32, color: '#1a1a1a', label: 'Dark', size: '0.7rem', border: '1px solid #555', type: 'trinity' }
+];
+
+// Chaos is separate because it is generated
+const chaosConfig = { id: 'chaos', x: 38, y: 32, color: '#c084fc', label: 'Chaos' };
+
+// Observer Point
+const observerStar = { id: 'observer', x: 50, y: 8, color: '#00ffff', label: 'You' };
+---
+
+<div class="star-map" id="game-container">
+  <!-- Background Noise -->
+  <div class="noise-overlay"></div>
+  
+  <!-- Connection Layer (SVG) -->
+  <svg class="conn-svg" aria-hidden="true">
+    <g id="conn-layer"></g>
+  </svg>
+  
+  <!-- Chaos Event Overlay (Flash/Noise) -->
+  <div id="chaos-overlay" class="chaos-overlay hidden"></div>
+  
+  <!-- Chaos Text Overlay -->
+  <div id="chaos-msg" class="chaos-msg hidden"></div>
+
+  <!-- Persistent Chaos Status HUD (Top Left) -->
+  <div id="chaos-status-hud" class="chaos-hud hidden">
+    <span class="hud-label">STATUS_MONITOR:</span>
+    <span class="hud-value" id="hud-val">INITIALIZING...</span>
+  </div>
+
+  <!-- Portal Confirmation Modal -->
+  <div id="portal-modal" class="portal-modal hidden">
+    <div class="portal-content">
+      <div class="portal-text" id="portal-text">
+        <span class="glitch-mask">UNKNOWN SIGNAL...</span><br>
+        <span class="small">It seems to be connected to a different place...</span>
+      </div>
+      <div class="portal-actions">
+        <button id="portal-yes" class="portal-btn confirm">PROCEED</button>
+        <button id="portal-no" class="portal-btn cancel">REJECT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Background Stars -->
+  {stars.map(star => (
+    <div 
+      class="star" 
+      data-id={star.id}
+      data-attr={star.id}
+      data-type={star.type}
+      data-x={star.x}
+      data-y={star.y}
+      style={`
+        top: ${star.y}%; 
+        left: ${star.x}%; 
+        --star-color: ${star.color};
+        width: ${star.size || '0.6rem'};
+        height: ${star.size || '0.6rem'};
+        border: ${star.border || 'none'};
+      `}
+      aria-label={star.label}
+    >
+        <div class="selection-ring"></div>
+    </div>
+  ))}
+  
+  <!-- Chaos Star -->
+  <div 
+    id="chaos-star"
+    class="star chaos-star hidden"
+    data-id="chaos"
+    data-attr="chaos"
+    style={`
+        top: ${chaosConfig.y}%; 
+        left: ${chaosConfig.x}%; 
+        --star-color: ${chaosConfig.color};
+        width: 1.5rem;
+        height: 1.5rem;
+    `}
+    aria-label="Chaos"
+  ></div>
+
+  <!-- Observer Star -->
+  <div 
+    class="star observer-star" 
+    data-id={observerStar.id}
+    style={`top: ${observerStar.y}%; left: ${observerStar.x}%; --star-color: ${observerStar.color};`}
+  ></div>
+
+  <!-- The Core -->
+  <div class="core-container" style="top: 15%; left: 50%;">
+    <CoreStar />
+  </div>
+</div>
+
+<style>
+  .star-map {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at bottom center, #0b0b15 0%, #000 100%);
+    overflow: hidden;
+    user-select: none;
+  }
+  
+  .conn-svg,
+  .conn-svg *,
+  #conn-layer,
+  #conn-layer * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 20; /* Above background, below stars */
+    pointer-events: none !important; /* STRICT: Always pass through */
+    overflow: visible;
+  }
+  
+  /* Fallback visibility for lines */
+  .conn-svg line {
+    stroke: rgba(170, 255, 255, 0.85);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    opacity: 1;
+  }
+
+  .noise-overlay {
+    position: absolute;
+    inset: 0;
+    /* Pure CSS Noise Fallback */
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.05;
+    pointer-events: none !important;
+    z-index: 1;
+  }
+
+  .star {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    background: var(--star-color);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--star-color), 0 0 20px var(--star-color);
+    cursor: pointer;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0.6;
+    z-index: 50; /* Ensure stars are above lines and overlays */
+    pointer-events: auto !important; /* Force clickability */
+    /* Halo Effect */
+    box-shadow: 0 0 10px var(--star-color), 0 0 20px var(--star-color), 0 0 40px rgba(255, 255, 255, 0.2);
+  }
+  
+  .star.connected {
+    transform: translate(-50%, -50%) scale(1.3);
+    opacity: 1;
+    z-index: 25;
+    border: 2px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 0 15px var(--star-color), 0 0 30px var(--star-color), 0 0 50px rgba(255, 255, 255, 0.4);
+  }
+
+  .star:hover {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 1;
+  }
+  
+  /* Selected State (Lock-on) */
+  .star.selected {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.3);
+    box-shadow: 0 0 15px #fff, 0 0 30px var(--star-color);
+    z-index: 15;
+  }
+  
+  .selection-ring {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240%; height: 240%;
+    border: 1px dashed rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    box-shadow: 0 0 15px var(--star-color), inset 0 0 10px var(--star-color);
+  }
+  
+  .star.selected .selection-ring {
+    opacity: 1;
+    animation: spin 6s linear infinite;
+  }
+
+  .observer-star {
+    animation: pulse 4s infinite ease-in-out;
+    opacity: 0.8 !important;
+  }
+
+  .core-container {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    pointer-events: auto !important;
+  }
+  
+  /* Chaos Styles */
+  .chaos-star.hidden { display: none; pointer-events: none !important; }
+  .chaos-star { transition: all 1s ease; z-index: 40; pointer-events: auto !important; }
+  .chaos-star.born { animation: chaos-pulse-unstable 0.2s infinite alternate; box-shadow: 0 0 0 4px #000, 0 0 20px #c084fc; cursor: help; }
+  .chaos-star.sealed { animation: chaos-pulse-stable 4s infinite ease-in-out; filter: hue-rotate(40deg) brightness(1.2); box-shadow: 0 0 0 2px rgba(0, 255, 255, 0.5), 0 0 30px rgba(0, 255, 255, 0.3); cursor: pointer; }
+  .chaos-star.harmony { 
+    background: white;
+    box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 40px #ff00de, 0 0 80px #00ffff;
+    animation: harmony-pulse 3s infinite ease-in-out;
+    cursor: default;
+  }
+  @keyframes harmony-pulse {
+    0% { transform: translate(-50%, -50%) scale(1); filter: hue-rotate(0deg); }
+    50% { transform: translate(-50%, -50%) scale(1.1); filter: hue-rotate(180deg); }
+    100% { transform: translate(-50%, -50%) scale(1); filter: hue-rotate(360deg); }
+  }
+
+  .chaos-msg { 
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); 
+    color: #c084fc; font-family: monospace; font-size: 1.2rem; 
+    background: #000; padding: 10px; border: 1px solid #c084fc; 
+    z-index: 950; pointer-events: none !important; 
+    white-space: pre; font-weight: bold; text-shadow: 0 0 5px #c084fc; 
+    transition: opacity 0.5s ease;
+    opacity: 0;
+  }
+  .chaos-msg.visible { opacity: 1; }
+  .chaos-msg.visible { opacity: 1; }
+  .chaos-msg.hidden { display: none; }
+
+  /* HUD Styles */
+  .chaos-hud {
+    position: absolute;
+    top: 20px; left: 20px;
+    font-family: monospace;
+    z-index: 100;
+    pointer-events: none !important;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 4px 8px;
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
+  }
+  .chaos-hud.hidden { display: none; }
+  .hud-label { margin-right: 8px; color: #888; letter-spacing: 1px; }
+  .hud-value { letter-spacing: 2px; }
+
+  /* Connection Line Styles (New) */
+  .conn {
+    transition: all 0.2s ease;
+    pointer-events: auto !important; /* Lines should also be interactable for removal */
+    opacity: 0.8;
+    cursor: pointer;
+    stroke-linecap: round;
+    /* Force visibility settings */
+    stroke: rgba(180, 255, 255, 0.85) !important;
+    stroke-width: 2px !important;
+    mix-blend-mode: lighten !important;
+  }
+  .conn:hover {
+    stroke-width: 5px !important;
+    filter: drop-shadow(0 0 8px #fff);
+    opacity: 1;
+    z-index: 100;
+  }
+
+  /* Ring 1: Standard Connection */
+  .conn--ring1 {
+    /* Base color is forced by .conn but we can add filter here if needed */
+    filter: drop-shadow(0 0 4px rgba(0,255,255,0.3));
+  }
+
+  /* Ring 2: Parallel Flowing Line */
+  /* Ring 2: Parallel Flowing Line */
+  .conn--ring2 {
+    /* Base Structural Line - Fainter */
+    stroke-dasharray: 4 6;
+    opacity: 0.5;
+    stroke: rgba(140, 255, 255, 0.4) !important;
+  }
+
+  .conn--ring2-flow {
+    /* Flowing Overlay - Bright */
+    stroke-dasharray: 20 60; /* Long gaps for "pulse" effect */
+    stroke-dashoffset: 0;
+    opacity: 1;
+    stroke: rgba(200, 255, 255, 1) !important;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.8));
+    animation: dashFlow 2s linear infinite;
+    z-index: 101; /* Above base lines */
+  }
+
+  @keyframes dashFlow {
+    to { stroke-dashoffset: -80; }
+  }
+
+  /* Portal Modal Styles */
+  .portal-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    pointer-events: none; /* Let clicks pass when hidden/transparent */
+  }
+  .portal-modal.hidden { display: none; }
+  /* When visible, backdrop blocks clicks? Or just content? 
+     Usually backdrop blocks. But user wants rigorous anti-block.
+     We'll make content auto. */
+  .portal-modal:not(.hidden) { pointer-events: auto; }
+  
+  .portal-content {
+    background: rgba(10, 10, 20, 0.9);
+    border: 1px solid #00ffff;
+    padding: 2rem;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+    text-align: center;
+    max-width: 400px;
+    position: relative;
+    overflow: hidden;
+    pointer-events: auto !important;
+  }
+  .portal-content::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 2px;
+    background: #00ffff;
+    animation: scanline 2s linear infinite;
+  }
+  
+  .portal-text {
+    color: #fff;
+    font-family: monospace;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+  }
+  .portal-text .small { font-size: 0.8em; color: #888; }
+  
+  .portal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+  
+  .portal-btn {
+    background: transparent;
+    border: 1px solid #555;
+    color: #888;
+    padding: 0.5rem 1.5rem;
+    font-family: monospace;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .portal-btn:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+  .portal-btn.confirm:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: #00ffff;
+    color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  }
+  .portal-btn.cancel:hover {
+    background: rgba(255, 0, 0, 0.1);
+    border-color: #ff0000;
+    color: #ff0000;
+  }
+  
+  @keyframes scanline { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(200px); opacity: 0; } }
+
+  /* Dark Screen Overlay Force */
+  .dark-screen {
+      /* Defined in JS but style insurance here */
+      pointer-events: none !important;
+  }
+
+</style>
+
+<script>
+  // Game Logic: Connection System (Optimized Rendering)
+  function initStarMap() {
+    console.log("[StarMap] Initializing...");
+
+    // --- ABORT CONTROLLER CLEANUP ---
+    if ((window as any).__CELESTIAL_STARMAP_ABORT__) {
+        (window as any).__CELESTIAL_STARMAP_ABORT__.abort();
+    }
+    const controller = new AbortController();
+    (window as any).__CELESTIAL_STARMAP_ABORT__ = controller;
+    const { signal } = controller;
+
+    const container = document.getElementById('game-container');
+    const chaosStar = document.getElementById('chaos-star');
+    const chaosOverlay = document.getElementById('chaos-overlay');
+    const chaosMsg = document.getElementById('chaos-msg');
+    
+    // Create Dark Screen Element
+    let darkScreen = document.querySelector('.dark-screen');
+    if (!darkScreen) {
+        darkScreen = document.createElement('div');
+        darkScreen.className = 'dark-screen';
+        document.body.appendChild(darkScreen);
+    }
+    // FIX: Ensure dark screen does not block clicks by default
+    (darkScreen as HTMLElement).style.pointerEvents = 'none';
+    
+    // CONSTANTS
+    const RING_ORDER = ['wood', 'fire', 'water', 'earth', 'metal', 'thunder'];
+    
+    // STATE DEFINITIONS
+    type ChaosState = 'NONE' | 'BORN_LOCKED' | 'UNSEALED' | 'SEALED' | 'HARMONY';
+
+    const state = {
+        selectedStarId: null as string | null,
+        connections: new Set<string>(), // Format: "id1-id2-layer"
+        history: [] as string[], 
+        chaos: 'NONE' as ChaosState,
+        harmony: false,
+        portalOpen: false,
+        portalTarget: null as string | null
+    };
+    
+    // --- RENDERING OPTIMIZATION ---
+    let layoutCache = new Map<string, {x: number, y: number}>();
+    let isLayoutDirty = true;
+    let rafId: number | null = null;
+    
+    function updateLayoutCache() {
+        if (!container) return;
+        
+        const rootRect = container.getBoundingClientRect();
+        const stars = container.querySelectorAll('.star');
+        
+        layoutCache.clear();
+        
+        stars.forEach(s => {
+            const id = s.getAttribute('data-id');
+            if (id) {
+                const rect = s.getBoundingClientRect();
+                layoutCache.set(id, {
+                    x: (rect.left - rootRect.left) + rect.width / 2,
+                    y: (rect.top - rootRect.top) + rect.height / 2
+                });
+            }
+        });
+        isLayoutDirty = false;
+    }
+    
+    function requestRender() {
+        if (rafId) return;
+        rafId = requestAnimationFrame(() => {
+            if (signal.aborted) return;
+            if (isLayoutDirty) updateLayoutCache();
+            renderLines();
+            rafId = null;
+        });
+    }
+    
+    function invalidateLayout() {
+        isLayoutDirty = true;
+        requestRender();
+    }
+    
+    // Bind Events for Layout Updates
+    window.addEventListener('resize', invalidateLayout, { signal });
+    window.addEventListener('scroll', invalidateLayout, { passive: true, signal });
+    
+    // ------------------------------
+    
+    const parseConn = (s: string) => s.split('-');
+    
+    function checkRing(layer: string) {
+        for (let i = 0; i < RING_ORDER.length; i++) {
+            const a = RING_ORDER[i];
+            const b = RING_ORDER[(i + 1) % RING_ORDER.length];
+            const ids = [a, b].sort();
+            const key = `${ids[0]}-${ids[1]}-${layer}`;
+            if (!state.connections.has(key)) return false;
+        }
+        return true;
+    }
+    
+    function checkRing1() { return checkRing('ring1'); }
+    function checkRing2() { return checkRing('ring2'); }
+
+    function isAdjacentInRing(id1: string, id2: string) {
+        const i1 = RING_ORDER.indexOf(id1);
+        const i2 = RING_ORDER.indexOf(id2);
+        if (i1 === -1 || i2 === -1) return false;
+        const diff = Math.abs(i1 - i2);
+        return diff === 1 || diff === (RING_ORDER.length - 1);
+    }
+
+    function getNoiseString(length: number = 6) {
+        const chars = "█▓▒░▮▯!@#$%^&*";
+        let res = "";
+        for(let i=0; i<length; i++) {
+            res += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return res;
+    }
+
+    function getGlitchText(text: string, intensity: number = 0.3) {
+        // intensity 0-1. 0 = clean, 1 = unreadable
+        let res = "";
+        const chars = "█▓▒░▮▯";
+        for (let i = 0; i < text.length; i++) {
+            if (Math.random() < intensity) {
+                res += chars.charAt(Math.floor(Math.random() * chars.length));
+            } else {
+                res += text[i];
+            }
+        }
+        return res;
+    }
+
+    // --- HUD Logic ---
+    function makeStatusNoise(mode: ChaosState) {
+        const baseWords = {
+            'NONE': "STABLE",
+            'BORN_LOCKED': "CRITICAL_ERROR",
+            'UNSEALED': "UNSEALED_PHASE_1",
+            'SEALED': "SEALED_CONTAINMENT",
+            'HARMONY': "HARMONY_ESTABLISHED"
+        };
+        const text = baseWords[mode] || "UNKNOWN";
+        if (mode === 'UNSEALED' || mode === 'BORN_LOCKED') return getGlitchText(text, 0.8);
+        else if (mode === 'SEALED') return getGlitchText(text, 0.4); 
+        else if (mode === 'HARMONY') return text; 
+        else return getGlitchText(text, 0.1);
+    }
+    
+    function renderChaosStatusHUD() {
+        const hud = document.getElementById('chaos-status-hud');
+        const val = document.getElementById('hud-val');
+        if (!hud || !val) return;
+        
+        hud.classList.remove('hidden');
+        let noiseHtml = makeStatusNoise(state.chaos);
+        
+        val.style.textShadow = 'none';
+        val.style.color = '#888';
+        val.className = 'hud-value';
+
+        if (state.chaos === 'HARMONY') {
+            val.className = 'hud-value glitch-mask';
+            val.style.color = '#fff';
+            val.style.textShadow = '0 0 5px #fff';
+        } else if (state.chaos === 'UNSEALED' || state.chaos === 'BORN_LOCKED') {
+            val.style.color = '#f0f';
+            val.style.textShadow = '0 0 5px #f0f';
+        } else if (state.chaos === 'SEALED') {
+            val.style.color = '#0ff';
+            val.style.textShadow = '0 0 2px #0ff';
+        }
+        val.innerHTML = noiseHtml;
+    }
+    
+    // --- Core Interaction Logic ---
+    
+    function handleConnect(id1: string, id2: string) {
+        if (state.harmony) return;
+        if (id1 === id2) return;
+        
+        const ids = [id1, id2].sort();
+        const baseKey = `${ids[0]}-${ids[1]}`;
+        
+        let layer = 'misc';
+        if (isAdjacentInRing(id1, id2)) {
+            const k1 = `${baseKey}-ring1`;
+            const k2 = `${baseKey}-ring2`;
+            if (!state.connections.has(k1)) layer = 'ring1';
+            else if (!state.connections.has(k2)) {
+                if (checkRing1()) layer = 'ring2';
+                else return; 
+            } else return; 
+        } else {
+            if (state.connections.has(`${baseKey}-misc`)) return;
+            layer = 'misc';
+        }
+        
+        const fullKey = `${baseKey}-${layer}`;
+        state.connections.add(fullKey);
+        state.history.push(fullKey); 
+        requestRender(); 
+        
+        if (ids[0] === 'dark' && ids[1] === 'light') trySpawnChaos();
+    }
+    
+    function removeConnection(key: string) {
+        if (state.harmony) return;
+        if (state.connections.has(key)) {
+            state.connections.delete(key);
+            state.history = state.history.filter(k => k !== key); 
+            requestRender();
+            const parts = parseConn(key);
+            if (parts[0] === 'dark' && parts[1] === 'light') setChaosState('NONE');
+        }
+    }
+    
+    function undoConnection() {
+        if (state.harmony) return;
+        if (state.history.length > 0) {
+            const key = state.history.pop();
+            if (key && state.connections.has(key)) {
+                state.connections.delete(key);
+                requestRender();
+                const parts = parseConn(key);
+                if (parts[0] === 'dark' && parts[1] === 'light') setChaosState('NONE');
+            }
+        }
+    }
+    
+    function renderLines() {
+        const svgLayer = document.getElementById('conn-layer');
+        if (!svgLayer) return;
+        svgLayer.innerHTML = '';
+        
+        updateStarVisuals();
+        
+        state.connections.forEach(key => {
+            const parts = parseConn(key);
+            if (parts.length < 3) return; 
+            
+            const [id1, id2, layer] = parts;
+            const p1 = layoutCache.get(id1);
+            const p2 = layoutCache.get(id2);
+            
+            if (p1 && p2) {
+                let x1 = p1.x; let y1 = p1.y;
+                let x2 = p2.x; let y2 = p2.y;
+                
+                if (layer === 'ring2') {
+                    const dx = x2 - x1; const dy = y2 - y1;
+                    const len = Math.sqrt(dx*dx + dy*dy);
+                    if (len > 0) {
+                        const nx = -dy / len; const ny = dx / len;
+                        const offset = 6; 
+                        x1 += nx * offset; y1 += ny * offset;
+                        x2 += nx * offset; y2 += ny * offset;
+                    }
+                }
+                
+                const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                line.setAttribute('x1', String(x1)); line.setAttribute('y1', String(y1));
+                line.setAttribute('x2', String(x2)); line.setAttribute('y2', String(y2));
+                line.setAttribute('stroke', 'rgba(170, 255, 255, 0.85)');
+                line.setAttribute('stroke-width', '2');
+                
+                if (layer === 'ring2') {
+                    line.setAttribute('class', `conn conn--ring2`);
+                    svgLayer.appendChild(line);
+
+                    const lineFlow = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    lineFlow.setAttribute('x1', String(x1)); lineFlow.setAttribute('y1', String(y1));
+                    lineFlow.setAttribute('x2', String(x2)); lineFlow.setAttribute('y2', String(y2));
+                    lineFlow.setAttribute('stroke', 'rgba(200, 255, 255, 1)'); 
+                    lineFlow.setAttribute('stroke-width', '3');
+                    lineFlow.setAttribute('class', `conn conn--ring2-flow`);
+                    // NO CLICK LISTENER
+                    svgLayer.appendChild(lineFlow);
+                } else if (layer === 'ring1') {
+                    line.setAttribute('class', `conn conn--ring1`);
+                    svgLayer.appendChild(line);
+                } else {
+                    line.setAttribute('class', `conn`);
+                    svgLayer.appendChild(line);
+                }
+                
+                // NO CLICK LISTENER for base lines either
+            }
+        });
+        renderChaosStatusHUD();
+    }
+
+    function updateStarVisuals() {
+        const connectedIds = new Set<string>();
+        state.connections.forEach(k => {
+            const parts = parseConn(k);
+            connectedIds.add(parts[0]);
+            connectedIds.add(parts[1]);
+        });
+        
+        const stars = container?.querySelectorAll('.star:not(.observer-star):not(.chaos-star)');
+        stars?.forEach(s => {
+            const id = s.getAttribute('data-id');
+            if (id && connectedIds.has(id)) s.classList.add('connected');
+            else s.classList.remove('connected');
+        });
+    }
+    
+    function trySpawnChaos() {
+        const r1 = checkRing1();
+        const r2 = checkRing2();
+        
+        if (r2) {
+            if (state.chaos === 'NONE') { triggerChaosFlash(); setChaosState('BORN_LOCKED'); }
+        } else if (r1) {
+            console.log("Spawn Inhibited: Ring 1 Seal Active");
+            return;
+        } else {
+            if (state.chaos === 'NONE') { triggerChaosFlash(); setChaosState('BORN_LOCKED'); }
+        }
+    }
+
+    function triggerChaosFlash() {
+        if (chaosOverlay) {
+            chaosOverlay.classList.remove('active');
+            void chaosOverlay.offsetWidth; 
+            chaosOverlay.classList.add('active');
+        }
+    }
+    
+    function setChaosState(newState: ChaosState) {
+        if (state.chaos === newState) return;
+        state.chaos = newState;
+
+        (window as any).__CELESTIAL_CHAOS_SEALED__ = (newState === 'SEALED');
+        
+        let rootState = 'stable';
+        if (newState === 'SEALED' || newState === 'BORN_LOCKED') rootState = 'sealed';
+        if (newState === 'HARMONY') rootState = 'harmony';
+
+        document.body.dataset.chaosState = rootState;
+        document.documentElement.dataset.chaosState = rootState;
+
+        console.log(`[Celestial] State Change: ${newState} -> RootState: ${rootState}`);
+
+        renderChaos();
+        
+        if (newState === 'BORN_LOCKED') {
+            spawnEffect();
+            const noiseText = getGlitchText("SPATIAL RIFT DETECTED", 0.6); 
+            showChaosMessage(noiseText, '#c084fc');
+            setTimeout(() => {
+                if (state.chaos === 'BORN_LOCKED') setChaosState('UNSEALED');
+            }, 3000);
+        }
+        
+        if (newState === 'SEALED') {
+            const noiseText = getGlitchText("RIFT IS CONTAINED", 0.3);
+            showChaosMessage(noiseText, '#00ffff');
+        }
+    
+        if (newState === 'HARMONY') {
+            state.harmony = true;
+            state.connections.clear();
+            state.history = [];
+            requestRender();
+            const noiseText = getGlitchText("RESONANCE STABLE", 0.1); 
+            showChaosMessage(noiseText + " <span class='small'>[MASKED]</span>", '#ffffff');
+        }
+        
+        renderChaosStatusHUD();
+    }
+
+    function showChaosMessage(text: string, color: string) {
+        if (chaosMsg) {
+            chaosMsg.innerHTML = text;
+            chaosMsg.style.borderColor = color;
+            chaosMsg.style.color = color;
+            chaosMsg.classList.remove('hidden');
+            chaosMsg.classList.add('visible');
+            setTimeout(() => {
+                chaosMsg.classList.remove('visible');
+                setTimeout(() => { chaosMsg.classList.add('hidden'); }, 500); 
+            }, 3000);
+        }
+    }
+    
+    function renderChaos() {
+        if (!chaosStar) return;
+        chaosStar.classList.remove('born', 'sealed', 'harmony'); 
+        chaosStar.style.pointerEvents = 'none'; 
+        
+        switch (state.chaos) {
+            case 'NONE': break;
+            case 'BORN_LOCKED':
+                chaosStar.classList.remove('hidden'); chaosStar.classList.add('born'); chaosStar.style.pointerEvents = 'none'; 
+                break;
+            case 'UNSEALED':
+                chaosStar.classList.remove('hidden'); chaosStar.classList.add('born'); chaosStar.style.pointerEvents = 'auto'; 
+                break;
+            case 'SEALED':
+                chaosStar.classList.remove('hidden'); chaosStar.classList.add('sealed'); chaosStar.style.pointerEvents = 'auto'; 
+                break;
+            case 'HARMONY':
+                chaosStar.classList.remove('hidden'); chaosStar.classList.add('harmony'); chaosStar.style.pointerEvents = 'auto'; 
+                break;
+        }
+    }
+
+    function spawnEffect() {
+        if (!chaosOverlay || !chaosMsg) return;
+        chaosOverlay.classList.remove('hidden'); chaosOverlay.classList.add('active');
+        
+        chaosMsg.innerHTML = `<span class="glitch-mask">${getNoiseString()}</span> BORN`;
+        chaosMsg.style.color = "#c084fc"; chaosMsg.style.borderColor = "#c084fc";
+        chaosMsg.classList.remove('hidden');
+        
+        setTimeout(() => chaosMsg.classList.add('hidden'), 800);
+        setTimeout(() => { chaosOverlay.classList.remove('active'); chaosOverlay.classList.add('hidden'); }, 400);
+    }
+    
+    // Interaction Handlers
+    if (container) {
+        try {
+            sessionStorage.setItem('CELESTIAL_RETURN_TO', window.location.pathname + window.location.search);
+        } catch (e) {
+            console.warn('SessionStorage access denied');
+        }
+
+        const stars = container.querySelectorAll('.star:not(.observer-star):not(.chaos-star)');
+        
+        stars.forEach(s => {
+            s.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = s.getAttribute('data-id');
+                if(!id) return;
+                
+                if (state.selectedStarId === null) {
+                state.selectedStarId = id;
+                s.classList.add('selected');
+                } else if (state.selectedStarId === id) {
+                state.selectedStarId = null;
+                s.classList.remove('selected');
+                } else {
+                const prev = container.querySelector(`.star[data-id="${state.selectedStarId}"]`);
+                if(prev) prev.classList.remove('selected');
+                if (state.selectedStarId) handleConnect(state.selectedStarId, id);
+                state.selectedStarId = null;
+                }
+            }, { signal });
+        });
+        
+        container.addEventListener('click', () => {
+        if (state.selectedStarId) {
+            const el = container.querySelector(`.star[data-id="${state.selectedStarId}"]`);
+            if (el) el.classList.remove('selected');
+            state.selectedStarId = null;
+        }
+        }, { signal });
+        
+        window.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'z') {
+            undoConnection();
+        }
+        }, { signal });
+
+        if (chaosStar) {
+        chaosStar.addEventListener('click', handleChaosClick, { signal });
+        }
+        
+        const modal = document.getElementById('portal-modal');
+        const btnYes = document.getElementById('portal-yes');
+        const btnNo = document.getElementById('portal-no');
+        
+        if (modal && btnYes && btnNo) {
+            btnYes.addEventListener('click', () => {
+                if (state.portalTarget) {
+                    document.body.style.filter = "invert(1)";
+                    setTimeout(() => {
+                        window.location.href = state.portalTarget!;
+                    }, 150);
+                }
+            }, { signal });
+            
+            btnNo.addEventListener('click', () => { closePortalModal(); }, { signal });
+            
+            modal.addEventListener('click', (e) => {
+                if(e.target === modal) closePortalModal();
+            }, { signal });
+        }
+
+        // INITIAL RENDER
+        // Wait for layout to settle (Astro/CSS might need a tick or transition)
+        invalidateLayout();
+        setTimeout(invalidateLayout, 100); 
+        setTimeout(invalidateLayout, 500); // Intro Animation Safety
+    }
+
+
+    function openPortalModal(target: string) {
+        state.portalTarget = target;
+        state.portalOpen = true;
+
+        const modal = document.getElementById('portal-modal');
+        const textEl = document.getElementById('portal-text');
+        if (!modal || !textEl) return;
+
+        modal.classList.remove('hidden');
+
+        if (state.chaos === 'HARMONY') {
+        textEl.innerHTML = `
+            <span style="color:#00ffff; text-shadow:0 0 10px #00ffff;">
+            ${getGlitchText("CONNECTION STABLE", 0)}
+            </span><br>
+            <span class="small">${getGlitchText("Passage Allowed", 0.1)}</span>
+        `;
+        return;
+        }
+
+        if (state.chaos === 'SEALED') {
+        textEl.innerHTML = `
+            <span class="glitch-mask" style="color:#00ffff;">
+            ${getGlitchText("TRACE DETECTED", 0.4)}
+            </span><br>
+            <span class="small">${getGlitchText("Signal integrity", 0.2)}: 42%</span>
+        `;
+        return;
+        }
+
+        textEl.innerHTML = `
+        <span class="glitch-mask">${getGlitchText("UNKNOWN SIGNAL", 0.8)}</span><br>
+        <span class="small">${getGlitchText("Destination unstable", 0.5)}</span>
+        `;
+    }
+
+    function closePortalModal() {
+        state.portalOpen = false;
+        state.portalTarget = null;
+        const modal = document.getElementById('portal-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function handleChaosClick(e: Event) {
+            e.stopPropagation();
+            
+            if (state.chaos === 'BORN_LOCKED') return; 
+
+            if (state.chaos === 'HARMONY' || state.harmony) {
+                openPortalModal('/rift/return?from=/observation');
+                return;
+            }
+            
+            if (state.chaos === 'UNSEALED') {
+                if (checkRing1()) {
+                    setChaosState('SEALED');
+                } else {
+                    openPortalModal('/rift/past-05?from=/observation');
+                }
+            } 
+            else if (state.chaos === 'SEALED') {
+                if (checkRing2()) {
+                    setChaosState('HARMONY');
+                } else {
+                    openPortalModal('/rift/past-15?from=/observation');
+                }
+            }
+    }
+  } // End initStarMap
+
+  // --- Bootstrapping ---
+  // Run on initial load
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initStarMap);
+  } else {
+    initStarMap();
+  }
+  
+  // Run on View Transitions
+  document.addEventListener('astro:page-load', initStarMap);
+
+</script>

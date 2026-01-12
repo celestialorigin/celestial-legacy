@@ -1,0 +1,372 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="DIMENSIONAL FRAGMENT | CELESTIAL" showStars={true} starPattern="rift">
+  <div class="rift-page">
+    <div class="noise-overlay"></div>
+    <div class="glitch-overlay"></div>
+    
+    <!-- Lucia silhouette in the distance -->
+    <div class="silhouette-background">
+      <div class="silhouette-figure"></div>
+    </div>
+    
+    <div class="container">
+      <div class="log-terminal">
+        <div class="terminal-header">
+          <span class="terminal-label">FRAGMENT_LOG</span>
+          <span class="terminal-status">UNSTABLE</span>
+        </div>
+        
+        <div class="log-entries">
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">……</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">記録同期中……まだ漂流している。</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">観測とは……創造と同義なのか？</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">もし、すべての層が接続されていたなら……</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">そのとき私は……どこに置かれる？</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">誰が……この記録を観測する？</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">観測者は……観測されているのか？</span>
+          </div>
+          
+          <div class="log-entry">
+            <span class="speaker">L▮̷░̷▒̷█̷:</span>
+            <span class="text">……</span>
+          </div>
+        </div>
+      </div>
+      
+      <button class="back-btn" onclick="history.back()">
+        ← RETURN
+      </button>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .rift-page {
+    min-height: 100vh;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+  }
+  
+  /* Noise overlay */
+  .noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+    z-index: 1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E");
+    animation: noise-fade 3s ease-in-out infinite;
+  }
+  
+  @keyframes noise-fade {
+    0%, 100% { opacity: 0.12; }
+    50% { opacity: 0.18; }
+  }
+  
+  /* Glitch overlay */
+  .glitch-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 255, 255, 0.03) 50%,
+      transparent 100%
+    );
+    animation: glitch-scan 8s linear infinite;
+  }
+  
+  @keyframes glitch-scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  
+  /* Silhouette background */
+  .silhouette-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .silhouette-figure {
+    width: 600px;
+    height: 95vh;
+    max-height: 1000px;
+    background-image: url('/images/lusia_back_silhouette.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center center;
+    opacity: 0.1;
+    filter: blur(0.5px) saturate(0.65) brightness(0.75) drop-shadow(0 0 1px rgba(0, 255, 255, 0.3)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.2));
+    animation: presence-breathe 12s ease-in-out infinite;
+    position: relative;
+  }
+  
+  .silhouette-figure::before {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    background: radial-gradient(
+      ellipse at 50% 20%,
+      rgba(0, 255, 255, 0.15) 0%,
+      rgba(180, 220, 255, 0.08) 30%,
+      transparent 70%
+    );
+    filter: blur(25px);
+    animation: edge-glow 8s ease-in-out infinite;
+  }
+  
+  .silhouette-figure::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' /%3E%3C/svg%3E");
+    opacity: 0;
+    pointer-events: none;
+    animation: noise-pass 15s ease-in-out infinite;
+  }
+  
+  @keyframes presence-breathe {
+    0%, 100% {
+      opacity: 0.08;
+    }
+    50% {
+      opacity: 0.12;
+    }
+  }
+  
+  @keyframes edge-glow {
+    0%, 100% {
+      opacity: 0.3;
+    }
+    50% {
+      opacity: 0.6;
+    }
+  }
+  
+  @keyframes noise-pass {
+    0%, 100% {
+      opacity: 0;
+    }
+    10% {
+      opacity: 0.15;
+    }
+    20%, 80% {
+      opacity: 0;
+    }
+    90% {
+      opacity: 0.12;
+    }
+  }
+  
+  .container {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Terminal */
+  .log-terminal {
+    width: 100%;
+    max-width: 700px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+    animation: terminal-flicker 0.1s infinite;
+  }
+  
+  @keyframes terminal-flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.98; }
+  }
+  
+  .terminal-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    font-family: monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  
+  .terminal-label {
+    color: rgba(0, 255, 255, 0.8);
+  }
+  
+  .terminal-status {
+    color: rgba(255, 100, 100, 0.8);
+    animation: status-blink 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes status-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+  
+  .log-entries {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .log-entry {
+    display: flex;
+    gap: 1rem;
+    opacity: 0;
+    animation: entry-fade-in 0.5s ease-out forwards;
+  }
+  
+  .log-entry:nth-child(1) { animation-delay: 0.2s; }
+  .log-entry:nth-child(2) { animation-delay: 0.5s; }
+  .log-entry:nth-child(3) { animation-delay: 0.8s; }
+  .log-entry:nth-child(4) { animation-delay: 1.1s; }
+  .log-entry:nth-child(5) { animation-delay: 1.4s; }
+  .log-entry:nth-child(6) { animation-delay: 1.7s; }
+  .log-entry:nth-child(7) { animation-delay: 2.0s; }
+  .log-entry:nth-child(8) { animation-delay: 2.3s; }
+  
+  @keyframes entry-fade-in {
+    from {
+      opacity: 0;
+      transform: translateX(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+  
+  .speaker {
+    font-family: monospace;
+    color: rgba(0, 255, 255, 0.9);
+    font-weight: bold;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    animation: speaker-glitch 3s ease-in-out infinite;
+  }
+  
+  @keyframes speaker-glitch {
+    0%, 100% {
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+    10% {
+      text-shadow: 2px 0 8px rgba(255, 0, 255, 0.5), -2px 0 8px rgba(0, 255, 0, 0.5);
+    }
+    20% {
+      text-shadow: 0 0 8px rgba(0, 255, 255, 0.5);
+    }
+  }
+  
+  .text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.6;
+    font-size: 1rem;
+  }
+  
+  /* Back button */
+  .back-btn {
+    margin-top: 4rem;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: rgba(0, 255, 255, 0.8);
+    font-family: monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    letter-spacing: 0.1em;
+  }
+  
+  .back-btn:hover {
+    background: rgba(0, 255, 255, 0.1);
+    border-color: rgba(0, 255, 255, 0.8);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+  }
+  
+  @media (max-width: 768px) {
+    .container {
+      padding: 2rem 1rem;
+    }
+    
+    .silhouette-container {
+      width: 150px;
+      height: 225px;
+      margin-bottom: 3rem;
+    }
+    
+    .log-terminal {
+      padding: 1.5rem;
+    }
+    
+    .log-entry {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+</style>
+
+<script>
+  // ESC key to go back
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      history.back();
+    }
+  });
+</script>

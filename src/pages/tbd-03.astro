@@ -1,0 +1,73 @@
+---
+import Layout from "../layouts/Layout.astro";
+import LogHeader from "../components/LogHeader.astro";
+import { getStar } from "../lib/getStar";
+
+const star = getStar("water");
+---
+
+<Layout title={star.title} showStars={false}>
+  <div class="content">
+    <article class="secret-log">
+      <div class:list={["sigil", `sigil--${star.colorKey}`, "monochrome"]} aria-hidden="true"></div>
+      <div class="card-inner">
+        <h1>{star.title}</h1>
+        <LogHeader 
+          displayId={star.displayId} 
+          internalId={star.internalId} 
+          type={star.type} 
+          status={star.status} 
+        />
+        <div class="log-body">
+          {star.paragraphs.map((line) => (
+            <p>{line}</p>
+          ))}
+        </div>
+        <div class="log-footer">
+          <a href="/">← HOMEへ戻る</a>
+        </div>
+      </div>
+    </article>
+  </div>
+</Layout>
+
+<style>
+  .secret-log {
+    position: relative;
+    max-width: 600px;
+    margin: 4rem auto;
+    padding: 2rem;
+    line-height: 1.8;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .card-inner {
+    position: relative;
+    z-index: 1;
+  }
+  .sigil.monochrome {
+    filter: grayscale(100%) saturate(0%) opacity(0.3);
+  }
+  h1 {
+    font-size: 1.8rem;
+    color: var(--c-accent);
+    margin-bottom: 0.5rem;
+  }
+  .log-body p {
+    margin-bottom: 1.5rem;
+    white-space: pre-line;
+  }
+  .log-footer {
+    margin-top: 4rem;
+    text-align: center;
+  }
+  .log-footer a {
+    opacity: 0.6;
+    transition: opacity 0.3s;
+  }
+  .log-footer a:hover {
+    opacity: 1;
+  }
+</style>

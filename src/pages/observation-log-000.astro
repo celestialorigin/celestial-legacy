@@ -1,0 +1,217 @@
+---
+const title = "LOG : 000";
+---
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <style>
+      html, body { height: 100%; margin: 0; background: #000; color: #fff; overflow: hidden; }
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        letter-spacing: 0.06em;
+      }
+
+      .log-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        padding: 10vh 12vw;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* 画像：後ろ姿。下寄りに配置 */
+      .bg-visual {
+        position: fixed;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        max-width: 1200px;
+        height: 100%;
+        background: url("/images/Youtube shorts生成用背面.png") bottom center / contain no-repeat;
+        opacity: 0.45;
+        filter: brightness(0.7) contrast(0.9) blur(0.5px);
+        pointer-events: none;
+        z-index: 5;
+      }
+
+      .noise-overlay {
+        position: fixed;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        opacity: 0.04;
+        pointer-events: none;
+        z-index: 6;
+      }
+
+      .log-content {
+        max-width: 600px;
+        margin-top: 2rem;
+      }
+
+      .log-line {
+        margin-bottom: 1.2rem;
+        font-size: 15px;
+        line-height: 1.6;
+        opacity: 0;
+        transform: translateY(10px);
+        transition: opacity 1s ease, transform 1s ease;
+      }
+
+      .log-line.is-visible {
+        opacity: 0.75;
+        transform: translateY(0);
+      }
+
+      .log-line[data-speaker="system"] {
+        color: rgba(255, 255, 255, 0.4);
+        font-size: 0.85rem;
+        font-family: monospace;
+      }
+
+      .return-link {
+        display: inline-block;
+        margin-top: 3rem;
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        text-decoration: none;
+        color: rgba(255, 255, 255, 0.2);
+        opacity: 0;
+        transition: opacity 1.5s ease, color 0.3s ease, text-shadow 0.3s ease;
+        padding: 10px;
+        pointer-events: none;
+      }
+      .return-link.is-ready {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .return-link:hover {
+        color: rgba(255, 255, 255, 0.8);
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      }
+
+      .fade-in {
+        animation: fadeInPage 1.2s forwards;
+      }
+      @keyframes fadeInPage {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+    </style>
+  </head>
+  <body class="fade-in">
+    <div class="noise-overlay"></div>
+    <div class="bg-visual"></div>
+
+    <main class="log-container">
+      <div id="log-content" class="log-content">
+        <!-- Lines will be injected here -->
+      </div>
+      <a href="/" id="return-link" class="return-link">RETURN</a>
+    </main>
+
+    <script>
+      const logData = [
+        { text: "[OBSERVATION LOG : 000]", speaker: "system" },
+        { text: "…", speaker: "break" },
+        { text: "Lucia：「……まだ、漂流してる。」", speaker: "" },
+        { text: "Lukia：「観測じゃない……“余分な視点”がある。」", speaker: "" },
+        { text: "…", speaker: "break" },
+        { text: "Lucia：「……聞こえる？」", speaker: "" },
+        // Permanent Noise Target (L is fixed, rest is noise)
+        { html: "Lucia：「……<span id='lusia-noise'>L</span>？」", speaker: "" },
+        { text: "…", speaker: "break" },
+        { text: "Lukia：「その名前を出すな。」", speaker: "" },
+        { text: "…", speaker: "break" },
+        { text: "[system] 想定外座標を検出。", speaker: "system" },
+        { text: "[system] 振り返るな。", speaker: "system" }
+      ];
+
+      const container = document.getElementById('log-content');
+      const returnLink = document.getElementById('return-link');
+
+      async function displayLog() {
+        for (const line of logData) {
+          if (line.speaker === 'break') {
+            await new Promise(r => setTimeout(r, 1000));
+            continue;
+          }
+
+          const el = document.createElement('div');
+          el.className = 'log-line';
+          if (line.speaker) el.setAttribute('data-speaker', line.speaker);
+
+          if (line.html) {
+            el.innerHTML = line.html;
+            // Start glitch immediately if this line contains the target
+            if (line.html.includes('lusia-noise')) {
+               // Slight delay to ensure DOM paint
+               setTimeout(initPermanentNoise, 50);
+            }
+          } else {
+            el.textContent = line.text;
+          }
+          
+          container?.appendChild(el);
+
+          // Trigger animation
+          setTimeout(() => el.classList.add('is-visible'), 50);
+
+          await new Promise(r => setTimeout(r, 1200));
+        }
+
+        // Return Link Ready
+        setTimeout(() => {
+          if (returnLink) {
+            returnLink.classList.add('is-ready');
+          }
+        }, 1000);
+      }
+      
+      // --- Permanent Noise Logic (L + Eternal Chaos) ---
+      function initPermanentNoise() {
+        const target = document.getElementById('lusia-noise');
+        if (!target) return;
+
+        // Noise pool excludes 'u','s','i','a' completely to ensure they never appear
+        const noisePool = "▓▒░█#%&@$*+\\/|=<>~^ｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ";
+        
+        const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        // Slower update for accessibility, but still noise
+        const intervalBase = isReduced ? 400 : 30;
+        const intervalVar = isReduced ? 200 : 50;
+
+        function noiseLoop() {
+            if (!document.body.contains(target)) return;
+
+            // Generate "L" + 4-7 noise chars
+            const len = 4 + Math.floor(Math.random() * 4); 
+            let s = "L";
+            for(let i=0; i<len; i++) {
+                s += noisePool[Math.floor(Math.random() * noisePool.length)];
+            }
+            target.textContent = s;
+            
+            // Occasional color shift for "ERROR" feel
+            target.style.color = Math.random() < 0.1 ? "#ff4444" : "#fff";
+            target.style.textShadow = Math.random() < 0.1 ? "2px 0 1px red" : "none";
+
+            setTimeout(noiseLoop, intervalBase + Math.random() * intervalVar);
+        }
+        noiseLoop();
+      }
+
+      window.addEventListener('DOMContentLoaded', displayLog);
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && returnLink?.classList.contains('is-ready')) {
+          window.location.href = '/';
+        }
+      });
+    </script>
+  </body>
+</html>

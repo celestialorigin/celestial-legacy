@@ -1,0 +1,218 @@
+---
+import "../styles/global.css";
+const { pathname } = Astro.url;
+const { starPattern = "home", showStars = true, bodyClass = "" } = Astro.props;
+
+let starsClass = "stars--mid";
+if (pathname === "/" || pathname === "/index.html") {
+  starsClass = "stars--high";
+} else if (pathname.startsWith("/deep-observation")) {
+  starsClass = "stars--low";
+}
+---
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>CELESTIAL</title>
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+		<script>
+			// Simple Intersection Observer for fade-in animations
+			document.addEventListener('DOMContentLoaded', () => {
+				const observerOptions = {
+					root: null,
+					rootMargin: '0px',
+					threshold: 0.1
+				};
+
+				const observer = new IntersectionObserver((entries, observer) => {
+					entries.forEach(entry => {
+						if (entry.isIntersecting) {
+							entry.target.classList.add('is-visible');
+							observer.unobserve(entry.target); // Only animate once
+						}
+					});
+				}, observerOptions);
+
+				document.querySelectorAll('.fade-in-section').forEach(section => {
+					observer.observe(section);
+				});
+			});
+		</script>
+	</head>
+	<body class={bodyClass} data-star-pattern={starPattern} data-stars={showStars ? "on" : "off"}>
+		<header class="site-header">
+			<div class="header-inner">
+				<a href="/" class="logo">CELESTIAL</a>
+				<nav>
+					<div class="nav-main">
+						<a href="/">Home</a>
+						<a href="/about">About</a>
+						<a href="/archive">Archive</a>
+						<a href="/signals">Signals</a>
+						<a href="/real-time">Real-time</a>
+						<a href="/contact">Contact</a>
+					</div>
+					<a href="/deep-observation" class="nav-deep" aria-label="深層観測（DEEP）へアクセスする">
+						<svg class="icon-keyhole" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.686 2 6 4.686 6 8a5.996 5.996 0 0 0 4 5.659V22h4v-8.341A5.996 5.996 0 0 0 18 8c0-3.314-2.686-6-6-6zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+						DEEP
+					</a>
+				</nav>
+			</div>
+		</header>
+
+		<main>
+			<slot />
+		</main>
+
+		<footer class="site-footer">
+			<div class="container footer-inner">
+				<p>&copy; {new Date().getFullYear()} CELESTIAL. All systems nominal.</p>
+				<a href="/deep-observation" class="footer-deep">
+					<svg class="icon-keyhole" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C8.686 2 6 4.686 6 8a5.996 5.996 0 0 0 4 5.659V22h4v-8.341A5.996 5.996 0 0 0 18 8c0-3.314-2.686-6-6-6zm0 2c2.21 0 4 1.79 4 4s-1.79 4-4 4-4-1.79-4-4 1.79-4 4-4z"/></svg>
+					DEEP OBSERVATION
+				</a>
+			</div>
+		</footer>
+	  <div class:list={["stars", starsClass]} aria-hidden="true" style="pointer-events: none;"></div>
+	  <div id="home-secret-stars" class="secret-stars" aria-hidden="true">
+  <a class="secret-star s1" href="/tbd-01" tabindex="-1" aria-label="green star"></a>
+  <a class="secret-star s2" href="/tbd-02" tabindex="-1" aria-label="red star"></a>
+  <a class="secret-star s3" href="/tbd-03" tabindex="-1" aria-label="blue star"></a>
+  <a class="secret-star s4" href="/tbd-04" tabindex="-1" aria-label="brown star"></a>
+  <a class="secret-star s5" href="/tbd-05" tabindex="-1" aria-label="silver star"></a>
+  <a class="secret-star s6" href="/tbd-06" tabindex="-1" aria-label="yellow star"></a>
+  <a class="secret-star s7" href="/tbd-07" tabindex="-1" aria-label="purple star"></a>
+</div>
+	  <div class="scanlines" aria-hidden="true" style="pointer-events: none;"></div>
+	</body>
+</html>
+
+<style is:global>
+	.site-header {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: var(--header-height);
+		background: rgba(5, 5, 16, 0.8);
+		backdrop-filter: blur(10px);
+		border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+		z-index: 100;
+		display: flex;
+		align-items: center;
+	}
+
+	.header-inner {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		padding: 0 4%; /* Horizontal padding for screen-edge proximity */
+	}
+
+	nav {
+		display: flex;
+		align-items: center;
+		flex-grow: 1;
+	}
+
+	.nav-main {
+		display: flex;
+		gap: 2rem;
+	}
+
+	.logo {
+		font-size: 1.5rem;
+		font-weight: 700;
+		letter-spacing: 2px;
+		color: #fff;
+		flex-shrink: 0;
+		margin-right: 4.5rem; /* 72px gap between logo and main nav */
+	}
+
+	nav a {
+		color: rgba(255, 255, 255, 0.7);
+		font-size: 0.9rem;
+		text-transform: uppercase;
+		letter-spacing: 1px;
+		transition: color 0.2s ease;
+	}
+
+	nav a:not(.nav-deep):hover {
+		color: var(--c-accent);
+	}
+
+	main {
+		min-height: 100vh;
+		padding-top: var(--header-height);
+	}
+
+	.site-footer {
+		padding: 2.5rem 0;
+		color: rgba(255, 255, 255, 0.3);
+		font-size: 0.8rem;
+		border-top: 1px solid rgba(255, 255, 255, 0.05);
+		margin-top: 4rem;
+	}
+
+	.footer-inner {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	/* DEEP Nav Item - "Closed Door" Aesthetic */
+	.nav-deep, .footer-deep {
+		display: inline-flex;
+		align-items: center;
+		gap: 6px;
+		padding: 4px 10px;
+		border: 1px solid rgba(138, 116, 178, 0.1);
+		border-radius: 4px;
+		background: rgba(40, 30, 60, 0.12);
+		color: rgba(138, 116, 178, 0.45) !important;
+		font-size: 0.75rem;
+		text-decoration: none;
+		letter-spacing: 0.1em;
+		opacity: 0.75;
+		transition: all 0.3s ease;
+	}
+
+	.nav-deep {
+		margin-left: auto; /* Push to far right */
+	}
+
+	.nav-deep:hover, .footer-deep:hover {
+		color: rgba(158, 136, 198, 0.8) !important;
+		background: rgba(60, 45, 90, 0.2);
+		border-color: rgba(138, 116, 178, 0.3);
+		opacity: 0.9;
+		box-shadow: 0 0 8px rgba(138, 116, 178, 0.05);
+	}
+
+	.icon-keyhole {
+		width: 12px;
+		height: 12px;
+		fill: currentColor;
+		opacity: 0.6;
+	}
+
+	@media (max-width: 768px) {
+		.header-inner {
+			flex-direction: column;
+			gap: 1rem;
+		}
+		nav a {
+			margin: 0 0.5rem;
+		}
+		.footer-inner {
+			flex-direction: column;
+			gap: 1.5rem;
+		}
+	}
+</style>

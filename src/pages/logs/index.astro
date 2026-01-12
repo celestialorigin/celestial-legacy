@@ -1,0 +1,210 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout title="OBSERVATION LOG | CELESTIAL" showStars={true} starPattern="logs">
+  <div class="container" style="max-width: 1000px; margin: 0 auto; padding-top: 2rem;">
+    <h1 style="text-align: center; letter-spacing: 0.1em; margin-bottom: 0.5rem; color: var(--c-accent);">OBSERVATION LOG</h1>
+    <p style="text-align: center; opacity: 0.8; font-size: 0.9em; margin-bottom: 3rem;">― 観測記録カテゴリー ―</p>
+
+    <div class="feature-strip" style="width: 100%; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;">
+      
+      <div class="feature-card rm-scan" id="card-field-notes">
+        <a class="card-link-overlay" href="/field-notes" aria-label="FIELD NOTES"></a>
+        <h3 class="feature-title">FIELD NOTES</h3>
+        <p class="feature-text">観測日誌 / 手記。日々の観測業務における個人的な記録。</p>
+        <a class="read-more" href="/field-notes">Read More</a>
+      </div>
+
+      <div class="feature-card rm-glow" id="card-sonic-trace">
+        <a class="card-link-overlay" href="/sonic-trace" aria-label="SONIC TRACE"></a>
+        <h3 class="feature-title">SONIC TRACE</h3>
+        <p class="feature-text">音響解析ログ。受信した信号の音声データアーカイブ。</p>
+        <a class="read-more" href="/sonic-trace">Read More</a>
+      </div>
+
+      <div class="feature-card rm-scan rm-fragments" id="card-fragments">
+        <a class="card-link-overlay" href="/fragments" aria-label="FRAGMENTS"></a>
+        <h3 class="feature-title">FRAGMENTS</h3>
+        <p class="feature-text">断片記録。画像データや視覚化されたノイズの集積。</p>
+        <a class="read-more" href="/fragments">Read More</a>
+      </div>
+
+      <div class="feature-card rm-slide" id="card-motion-archive">
+        <a class="card-link-overlay" href="/motion-archive" aria-label="MOTION ARCHIVE"></a>
+        <h3 class="feature-title">MOTION ARCHIVE</h3>
+        <p class="feature-text">映像記録。観測された事象の動的な記録データ。</p>
+        <a class="read-more" href="/motion-archive">Read More</a>
+      </div>
+
+      <div class="feature-card rm-glow rm-coexistence" id="card-co-existence">
+        <a class="card-link-overlay" href="/logs/C-2084-001" aria-label="CO-EXISTENCE LOG"></a>
+        <h3 class="feature-title">CO-EXISTENCE LOG</h3>
+        <p class="feature-text">共生記録。内部システムおよび観測対象との対話ログ。</p>
+        <a class="read-more" href="/logs/C-2084-001">Read More</a>
+      </div>
+
+      <div class="feature-card rm-slide rm-observers" id="card-observers">
+        <a class="card-link-overlay" href="/observers" aria-label="OBSERVERS"></a>
+        <h3 class="feature-title">OBSERVERS</h3>
+        <p class="feature-text">観測者リスト。本プロジェクトに関わる観測者たちの記録。</p>
+        <a class="read-more" href="/observers">Read More</a>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 60px; text-align: center;">
+      <a href="/archive" style="opacity: 0.6; text-decoration: none;">→ 全アーカイブを見る</a>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .feature-card {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 180px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    border-radius: 14px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+  }
+
+  .card-link-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+  }
+
+  .feature-card:hover {
+    background: rgba(0, 255, 255, 0.03);
+    border-color: rgba(0, 255, 255, 0.22);
+    box-shadow: 0 0 22px rgba(0, 255, 255, 0.09);
+    transform: translateY(-2px);
+  }
+
+  /* Read More Base */
+  .read-more {
+    margin-top: auto;
+    padding-top: 1.2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--c-accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    position: relative;
+    display: inline-block;
+    width: fit-content;
+    text-decoration: none;
+    transition: all 0.25s ease;
+    z-index: 6; /* Stay above overlay for hover effects but still trigger overlay */
+  }
+
+  /* Hover Effect A: Scan */
+  .rm-scan .read-more::before {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 1px;
+    background: var(--c-accent);
+    box-shadow: 0 0 8px var(--c-accent-glow);
+    transition: width 0.28s ease;
+  }
+  .feature-card.rm-scan:hover .read-more::before {
+    width: 100%;
+  }
+  /* Fragments specific: dashed/stepped line */
+  .rm-fragments:hover .read-more::before {
+    background: repeating-linear-gradient(90deg, var(--c-accent) 0, var(--c-accent) 4px, transparent 4px, transparent 6px);
+  }
+
+  /* Hover Effect B: Glow */
+  @keyframes rm-breathing {
+    0%, 100% { opacity: 0.8; text-shadow: 0 0 4px var(--c-accent-glow); }
+    50% { opacity: 1; text-shadow: 0 0 12px var(--c-accent); }
+  }
+  .feature-card.rm-glow:hover .read-more {
+    animation: rm-breathing 1.5s infinite ease-in-out;
+  }
+  .rm-coexistence:hover .read-more {
+    animation-duration: 2s;
+    opacity: 0.9;
+  }
+
+  /* Hover Effect C: Slide */
+  .rm-slide .read-more {
+    transition: all 0.25s ease;
+  }
+  .rm-slide .read-more::after {
+    content: " →";
+    opacity: 0;
+    margin-left: 0;
+    transition: all 0.25s ease;
+    display: inline-block;
+    transform: translateX(-5px);
+  }
+  .feature-card.rm-slide:hover .read-more {
+    transform: translateX(4px);
+  }
+  .feature-card.rm-slide:hover .read-more::after {
+    opacity: 1;
+    transform: translateX(0);
+    margin-left: 4px;
+  }
+  /* Observers specific: slightly stronger */
+  .rm-observers:hover .read-more {
+    transform: translateX(6px);
+  }
+
+  /* Silhouettes Background */
+  .feature-card::before {
+    content: "";
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    width: 110px;
+    height: 110px;
+    opacity: 0.05;
+    pointer-events: none;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    filter: blur(3px);
+    transition: opacity 0.3s ease;
+    z-index: 0;
+  }
+  .feature-card:hover::before {
+    opacity: 0.07;
+  }
+
+  /* Silhouette Icons */
+  #card-field-notes::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'/%3E%3C/svg%3E");
+  }
+  #card-sonic-trace::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z'/%3E%3C/svg%3E");
+  }
+  #card-fragments::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M21 5h-7V2l-4 4 4 4V7h5v3h3V5zM3 19h7v3l4-4-4-4v3H5v-3H2v5zM3 5v3h3V5h5V2L7 6l4 4V7H5v3h3v3h3v-3l4 4-4 4v-3H8v3H5v-3H2v5h7v3l4-4-4-4v3H3z'/%3E%3C/svg%3E");
+  }
+  #card-motion-archive::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M18 3v2h-2V3H8v2H6V3H4v18h2v-2h2v2h8v-2h2v2h2V3h-2zM8 17H6v-2h2v2zm0-4H6v-2h2v2zm0-4H6V7h2v2zm10 8h-2v-2h2v2zm0-4h-2v-2h2v2zm0-4h-2V7h2v2z'/%3E%3C/svg%3E");
+  }
+  #card-co-existence::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z'/%3E%3C/svg%3E");
+  }
+  #card-observers::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+  }
+
+  .feature-title, .feature-text {
+    position: relative;
+    z-index: 1;
+  }
+</style>

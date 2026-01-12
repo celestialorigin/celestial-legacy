@@ -1,0 +1,160 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// v0: Check for Environment Variable for manual live embed
+// In production, this would be set via GitHub Secrets/Vars or Vercel Env
+const LIVE_EMBED_URL = import.meta.env.PUBLIC_LIVE_EMBED_URL;
+const isLive = !!LIVE_EMBED_URL;
+---
+
+<Layout title="LIVE MONITOR" bodyClass="page-realtime">
+  <main class="console-container fade-in-section">
+    <div class="header-section">
+      <h1 class="glitch-text" data-text="LIVE OBSERVATION">LIVE OBSERVATION</h1>
+      <p class="subtitle">REAL-TIME STREAM MONITORING</p>
+    </div>
+
+    <!-- Live Monitor Frame -->
+    <div class="monitor-frame">
+      {isLive ? (
+        <div class="video-wrapper">
+          <iframe 
+            src={LIVE_EMBED_URL} 
+            title="Live Stream" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            allowfullscreen
+          ></iframe>
+        </div>
+      ) : (
+        <div class="offline-screen">
+          <div class="crt-overlay"></div>
+          <p class="status-text">NO LIVE SIGNAL DETECTED</p>
+          <p class="sub-text">SCANNING FREQUENCIES...</p>
+        </div>
+      )}
+    </div>
+
+    <div class="actions">
+      <a href="/signals" class="btn-secondary">>> CHECK SIGNAL LOGS</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  .console-container {
+    max-width: 1100px;
+    margin: 120px auto 40px;
+    padding: 0 20px;
+  }
+
+  .header-section {
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+
+  h1 {
+    font-family: 'Zen Kaku Gothic New', sans-serif;
+    font-size: 2rem;
+    color: #e0faff;
+    letter-spacing: 0.1em;
+    margin: 0;
+  }
+
+  .subtitle {
+    font-family: monospace;
+    color: rgba(0, 255, 255, 0.6);
+    font-size: 0.9rem;
+    margin: 0;
+  }
+
+  /* Monitor Frame */
+  .monitor-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #000;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .monitor-frame::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: radial-gradient(circle, transparent 90%, rgba(0, 20, 30, 0.8));
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .video-wrapper {
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-wrapper iframe {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Offline Screen */
+  .offline-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: #050508;
+    color: rgba(0, 255, 255, 0.5);
+    font-family: monospace;
+    position: relative;
+  }
+
+  .status-text {
+    font-size: 1.5rem;
+    letter-spacing: 0.2em;
+    animation: blink 2s infinite;
+  }
+
+  .sub-text {
+    font-size: 0.9rem;
+    margin-top: 10px;
+    color: rgba(0, 255, 255, 0.3);
+  }
+
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  /* Actions */
+  .actions {
+    margin-top: 30px;
+    text-align: right;
+  }
+
+  .btn-secondary {
+    display: inline-block;
+    padding: 10px 24px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    color: rgba(0, 255, 255, 0.8);
+    text-decoration: none;
+    font-family: monospace;
+    transition: all 0.3s;
+    background: rgba(0, 20, 30, 0.6);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(0, 255, 255, 0.15);
+    color: #fff;
+    border-color: rgba(0, 255, 255, 0.8);
+  }
+</style>

@@ -1,0 +1,78 @@
+---
+interface Props {
+  displayId: string;
+  internalId: string;
+  type: string;
+  status: string;
+}
+
+const { displayId, internalId, type, status } = Astro.props;
+---
+
+<div 
+  class="log-header" 
+  data-internal-id={internalId} 
+  data-type={type} 
+  data-status={status}
+>
+  <div class="log-header__main">
+    <span class="log-header__id">{displayId}</span>
+  </div>
+  <div class="log-header__sub">
+    <span class="log-header__meta">TYPE: {type}</span>
+    <span class="log-header__divider">/</span>
+    <span class="log-header__meta">STATUS: {status}</span>
+    <span class="log-header__divider">/</span>
+    <span class="log-header__meta">REF: {internalId}</span>
+  </div>
+</div>
+
+<style>
+  .log-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    user-select: none;
+  }
+
+  .log-header__main {
+    margin-bottom: 0.5rem;
+  }
+
+  .log-header__id {
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--c-accent);
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+  }
+
+  .log-header__sub {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.4);
+    letter-spacing: 0.1em;
+    align-items: center;
+  }
+
+  .log-header__meta {
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .log-header__divider {
+    opacity: 0.3;
+  }
+
+  @media (max-width: 480px) {
+    .log-header__sub {
+      gap: 0.5rem;
+    }
+    .log-header__divider {
+      display: none;
+    }
+  }
+</style>
