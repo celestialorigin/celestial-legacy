@@ -2,13 +2,15 @@
   "name": "celestial-project",
   "private": true,
   "type": "module",
-  "scripts": {
-    "dev": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "check": "astro check",
-    "new:dialogue": "node ./scripts/new-dialogue.mjs"
-  },
+"scripts": {
+  "dev": "astro dev",
+  "build": "astro build",
+  "preview": "astro preview",
+  "check": "astro check",
+  "new:dialogue": "node ./scripts/new-dialogue.mjs",
+  "new:activity": "node ./scripts/new-activity.mjs"
+},
+
   "dependencies": {
     "astro": "^5.16.6"
   },
