@@ -3,8 +3,9 @@ name: Deploy to GitHub Pages (Scheduled)
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   schedule:
+    # 6時間ごと（JST基準で出したいなら別途調整可）
     - cron: "0 */6 * * *"
 
 permissions:
@@ -23,11 +24,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Pages 推奨: ビルド/デプロイ環境をセット
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install
         run: npm ci
