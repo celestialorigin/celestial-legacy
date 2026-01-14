@@ -86,7 +86,8 @@ function parsePublishAtRaw(publishAtRaw) {
  *   --desc "説明"
  *   --slug "custom-slug"
  *   --publish "YYYY-MM-DD HH:mm"   (空なら今)
- *   --visibility public|private
+ *   --visibility public|unlisted|draft
+ *   --source internal|youtube|twitch|vrchat|kakuyomu|note|x
  *   --open                         (生成後にファイルパス表示のみ。エディタ起動はしない)
  *   --git                          (git add/commit まで実行)
  *   --push                         (--git と併用で git pull --rebase & git push もする)
@@ -103,6 +104,7 @@ function parseArgs(argv) {
     slug: "",
     publish: "",
     visibility: "public",
+    source: "internal",
     open: false,
     git: false,
     push: false,
@@ -125,6 +127,9 @@ function parseArgs(argv) {
     } else if (a === "--visibility") {
       out.visibility = takeValue(i);
       i++;
+    } else if (a === "--source") {
+      out.source = takeValue(i);
+      i++;
     } else if (a === "--open") out.open = true;
     else if (a === "--git") out.git = true;
     else if (a === "--push") out.push = true;
@@ -132,7 +137,14 @@ function parseArgs(argv) {
   }
 
   if (out.push) out.git = true;
-  if (!["public", "private"].includes(out.visibility)) out.visibility = "public";
+
+  // visibility normalize (compatible with config.ts)
+  if (!["public", "unlisted", "draft"].includes(out.visibility)) out.visibility = "public";
+
+  // source normalize (keep permissive but stable)
+  const allowedSources = ["internal", "youtube", "twitch", "vrchat", "kakuyomu", "note", "x"];
+  if (!allowedSources.includes(out.source)) out.source = "internal";
+
   return out;
 }
 
@@ -147,7 +159,8 @@ Options:
   --desc "..."                   Description（任意）
   --slug "..."                   slug を指定（任意）
   --publish "YYYY-MM-DD HH:mm"   publishAt（任意。省略で今）
-  --visibility public|private
+  --visibility public|unlisted|draft
+  --source internal|youtube|twitch|vrchat|kakuyomu|note|x
   --git                          git add/commit まで実行
   --push                         （--git含む）git pull --rebase & git push も実行
   --open
@@ -201,16 +214,16 @@ async function interactiveFallback(current) {
     const title = current.title || (await ask(rl, "Title（必須）: "));
     if (!title) return { ...current, title: "" };
 
-    const desc =
-      current.desc || (await ask(rl, "Description（任意・空でOK）: "));
+    const desc = current.desc || (await ask(rl, "Description（任意・空でOK）: "));
     const publish =
       current.publish ||
       (await ask(rl, 'publishAt（任意）: 空=今 / 例 "2026-02-01 21:00": '));
     const slugSeed =
       current.slug || (await ask(rl, "slug（任意）: 空=タイトルから自動生成: "));
     const visibility = current.visibility || "public";
+    const source = current.source || "internal";
 
-    return { ...current, title, desc, publish, slug: slugSeed, visibility };
+    return { ...current, title, desc, publish, slug: slugSeed, visibility, source };
   } finally {
     process.removeListener("SIGINT", onSigint);
     rl.close();
@@ -265,12 +278,27 @@ async function main() {
   const filepath = uniqueFilePath(contentDir, baseName);
 
   const publishAtIso = formatIsoWithOffset(publishAtDate);
+  const createdAtIso = formatIsoWithOffset(now);
 
   const body = `---
+type: "dialogue"
+source: "${opts.source}"
 title: ${JSON.stringify(opts.title)}
 description: ${opts.desc ? JSON.stringify(opts.desc) : '""'}
 publishAt: "${publishAtIso}"
+createdAt: "${createdAtIso}"
 visibility: "${opts.visibility}"
+
+# 互換: 旧tagsは必要な時だけ手で付ける（今後は tagsV1 を主軸にする）
+# tags: []
+
+tagsV1:
+  world: []
+  system: []
+  activity: []
+  theme: []
+
+relations: []
 ---
 
 # ${opts.title}
@@ -285,7 +313,9 @@ visibility: "${opts.visibility}"
 
   // ここから任意で git まで（「未来の自分が楽」）
   if (opts.git) {
-    const rel = path.relative(process.cwd(), filepath).replaceAll("\\", "/");
+    const rel = path
+      .relative(process.cwd(), filepath)
+      .replaceAll("\\", "/");
     console.log("");
     console.log("🔧 git automation:");
 
@@ -297,7 +327,6 @@ visibility: "${opts.visibility}"
     safeExec(`git commit -m "${msg}"`);
 
     if (opts.push) {
-      // “fetch first” を潰す：push前に必ず rebase
       console.log("");
       console.log("🔁 sync before push: git pull --rebase");
       const ok = safeExecTry(`git pull --rebase`);
@@ -323,7 +352,9 @@ visibility: "${opts.visibility}"
     console.log("");
     console.log("Next:");
     console.log("1) 内容を書く");
-    console.log('2) git add . && git commit -m "feat: add dialogue" && git pull --rebase && git push');
+    console.log(
+      '2) git add . && git commit -m "feat: add dialogue" && git pull --rebase && git push'
+    );
   }
 
   if (opts.open) {
