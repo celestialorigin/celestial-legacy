@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches: ["main"]
+    
   schedule:
-    # 6時間ごと（JST基準で出したいなら別途調整可）
-    - cron: "0 */6 * * *"
+  - cron: "0 * * * *"
 
 permissions:
   contents: read
