@@ -1,3 +1,7 @@
+このリポジトリは legacy
+
+本流は celestial-core
+
 # Astro Starter Kit: Basics
 
 ```sh
