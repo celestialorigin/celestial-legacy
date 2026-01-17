@@ -51,31 +51,46 @@ jobs:
           # coreがprivateなら下を有効化（後述）
           # token: ${{ secrets.CORE_REPO_TOKEN }}
 
-      # ★ 追加: coreのcontentをlegacyへ同期（ビルド前）
-      - name: Sync core content into legacy
+      # ★ 置換: coreのサイト本体をlegacyへ同期（ビルド前）
+      - name: Sync core site into legacy (SAFE FULL)
         shell: bash
         run: |
           set -euo pipefail
 
-          echo "== Sync core/src/content -> legacy/src/content =="
+          echo "== SAFE FULL SYNC core -> legacy =="
 
-          mkdir -p src/content/dialogues src/content/activities
+          # legacy側で残すもの（絶対に触らない）
+          # - .github/workflows（デプロイ装置）
+          # - secrets / pages設定
 
-          # ゴミ残り防止：完全同期（必要ならここを“差分同期”に変えてもOK）
-          rm -rf src/content/dialogues/*
-          rm -rf src/content/activities/*
+          # === 1) サイト本体を core で上書き ===
+          rm -rf src public
+          cp -a _core/src ./src
+          cp -a _core/public ./public
 
-          if [ -d "_core/src/content/dialogues" ]; then
-            cp -a _core/src/content/dialogues/. src/content/dialogues/
+          # === 2) 設定類（必要なものだけ同期）===
+          cp -a _core/astro.config.mjs ./astro.config.mjs
+          cp -a _core/package.json ./package.json
+
+          # lockfile は core 側にあるものを採用（npm ci の前提を維持）
+          rm -f package-lock.json pnpm-lock.yaml yarn.lock
+          if [ -f "_core/package-lock.json" ]; then
+            cp -a _core/package-lock.json ./package-lock.json
+          elif [ -f "_core/pnpm-lock.yaml" ]; then
+            cp -a _core/pnpm-lock.yaml ./pnpm-lock.yaml
+          elif [ -f "_core/yarn.lock" ]; then
+            cp -a _core/yarn.lock ./yarn.lock
+          else
+            echo "WARN: No lockfile found in core. npm ci may fail."
           fi
 
-          if [ -d "_core/src/content/activities" ]; then
-            cp -a _core/src/content/activities/. src/content/activities/
-          fi
+          echo "== Core revision =="
+          git -C _core rev-parse HEAD
 
-          echo "Synced counts:"
-          echo "dialogues: $(find src/content/dialogues -type f | wc -l)"
-          echo "activities: $(find src/content/activities -type f | wc -l)"
+          echo "== Synced summary =="
+          echo "src/pages: $(find src/pages -type f | wc -l)"
+          echo "public files: $(find public -type f | wc -l)"
+
 
       # Pages 推奨: ビルド/デプロイ環境をセット
       - name: Setup Pages
