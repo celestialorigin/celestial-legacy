@@ -52,44 +52,46 @@ jobs:
           # token: ${{ secrets.CORE_REPO_TOKEN }}
 
       # ★ 置換: coreのサイト本体をlegacyへ同期（ビルド前）
-      - name: Sync core site into legacy (SAFE FULL)
+      - name: Sync core into legacy (site + content)
         shell: bash
         run: |
           set -euo pipefail
+          echo "== Sync core -> legacy =="
 
-          echo "== SAFE FULL SYNC core -> legacy =="
-
-          # legacy側で残すもの（絶対に触らない）
-          # - .github/workflows（デプロイ装置）
-          # - secrets / pages設定
-
-          # === 1) サイト本体を core で上書き ===
-          rm -rf src public
-          cp -a _core/src ./src
-          cp -a _core/public ./public
-
-          # === 2) 設定類（必要なものだけ同期）===
-          cp -a _core/astro.config.mjs ./astro.config.mjs
-          cp -a _core/package.json ./package.json
-
-          # lockfile は core 側にあるものを採用（npm ci の前提を維持）
-          rm -f package-lock.json pnpm-lock.yaml yarn.lock
-          if [ -f "_core/package-lock.json" ]; then
-            cp -a _core/package-lock.json ./package-lock.json
-          elif [ -f "_core/pnpm-lock.yaml" ]; then
-            cp -a _core/pnpm-lock.yaml ./pnpm-lock.yaml
-          elif [ -f "_core/yarn.lock" ]; then
-            cp -a _core/yarn.lock ./yarn.lock
-          else
-            echo "WARN: No lockfile found in core. npm ci may fail."
+          # --- content ---
+          mkdir -p src/content
+          rm -rf src/content/*
+          if [ -d "_core/src/content" ]; then
+            cp -a _core/src/content/. src/content/
           fi
 
-          echo "== Core revision =="
-          git -C _core rev-parse HEAD
+          # --- site sources (pages/layouts/components/styles) ---
+          mkdir -p src/pages src/layouts src/components src/styles
 
-          echo "== Synced summary =="
-          echo "src/pages: $(find src/pages -type f | wc -l)"
-          echo "public files: $(find public -type f | wc -l)"
+          rm -rf src/pages/* src/layouts/* src/components/* src/styles/*
+          if [ -d "_core/src/pages" ]; then
+            cp -a _core/src/pages/. src/pages/
+          fi
+          if [ -d "_core/src/layouts" ]; then
+            cp -a _core/src/layouts/. src/layouts/
+          fi
+          if [ -d "_core/src/components" ]; then
+            cp -a _core/src/components/. src/components/
+          fi
+          if [ -d "_core/src/styles" ]; then
+            cp -a _core/src/styles/. src/styles/
+          fi
+
+          # --- public assets (images/audio) ---
+          mkdir -p public
+          if [ -d "_core/public" ]; then
+            cp -a _core/public/. public/
+          fi
+
+          echo "Synced file counts:"
+          echo "pages: $(find src/pages -type f | wc -l)"
+          echo "content: $(find src/content -type f | wc -l)"
+
 
 
       # Pages 推奨: ビルド/デプロイ環境をセット
