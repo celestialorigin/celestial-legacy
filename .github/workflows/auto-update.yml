@@ -21,13 +21,6 @@ jobs:
         with:
           lfs: true
           fetch-depth: 0
-    
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
